@@ -10,18 +10,19 @@ const navigation = [
       { label: "Magic Portfolio", href: "https://once-ui.com/products/magic-portfolio" },
       { label: "Magic Docs", href: "https://once-ui.com/products/magic-docs" },
       { label: "Magic Bio", href: "https://once-ui.com/products/magic-bio" },
-      { label: "Once UI Figma", href: "/figma" },
+      { label: "Once UI Figma", href: "https://once-ui.com/figma" },
     ],
   },
   {
     title: "Pro",
     items: [
       { label: "Supa Social", href: "https://once-ui.com/products/supa-social", tag: "New" },
-      { label: "Magic Spotlight", href: "https://once-ui.com/products/magic-spotlight" },
       { label: "Supabase Starter", href: "https://once-ui.com/products/supabase-starter" },
-      { label: "Magic Agent", href: "https://once-ui.com/products/magic-agent" },
       { label: "Magic Convert", href: "https://once-ui.com/products/magic-convert" },
+      { label: "Magic Spotlight", href: "https://once-ui.com/products/magic-spotlight" },
+      { label: "Magic Journal", href: "https://once-ui.com/products/magic-journal", tag: "New" },
       { label: "Magic Store", href: "https://once-ui.com/products/magic-store" },
+      { label: "Magic Agent", href: "https://once-ui.com/products/magic-agent" },
       { label: "Once UI Blocks", href: "https://once-ui.com/blocks/quickStart" },
     ]
   },
@@ -33,6 +34,7 @@ const navigation = [
       { label: "Documentation", href: "/" },
       { label: "Changelog", href: "/changelog" },
       { label: "Roadmap", href: "/roadmap" },
+      { label: "Handbook", href: "https://once-ui.com/handbook", tag: "New" }
     ],
   },
   {
