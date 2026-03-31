@@ -75,7 +75,9 @@ const StylePanel = forwardRef<HTMLDivElement, StylePanelProps>(({ ...rest }, ref
   return (
     <Column fillWidth gap="16" ref={ref} {...rest}>
       <Column fillWidth paddingTop="12" paddingLeft="16" gap="4">
-        <Text variant="heading-strong-s">Page</Text>
+        <Text variant="heading-strong-s" onBackground="neutral-strong">
+          Page
+        </Text>
         <Text variant="body-default-s" onBackground="neutral-weak">
           Customize page theme
         </Text>
@@ -89,11 +91,11 @@ const StylePanel = forwardRef<HTMLDivElement, StylePanelProps>(({ ...rest }, ref
           paddingY="16"
           borderBottom="neutral-alpha-medium"
         >
-          <Text variant="label-default-s">Theme</Text>
+          <Text variant="label-default-s" onBackground="neutral-strong">Theme</Text>
           <ThemeSwitcher />
         </Flex>
         <Flex horizontal="between" vertical="center" fillWidth paddingX="24" paddingY="16">
-          <Text variant="label-default-s">Shape</Text>
+          <Text variant="label-default-s" onBackground="neutral-strong">Shape</Text>
           <Flex gap="4">
             {shapes.map((radius, index) => (
               <Flex
@@ -120,7 +122,9 @@ const StylePanel = forwardRef<HTMLDivElement, StylePanelProps>(({ ...rest }, ref
       </Column>
 
       <Column fillWidth paddingTop="12" paddingLeft="16" gap="4">
-        <Text variant="heading-strong-s">Color</Text>
+        <Text variant="heading-strong-s" onBackground="neutral-strong">
+          Color
+        </Text>
         <Text variant="body-default-s" onBackground="neutral-weak">
           Customize color schemes
         </Text>
@@ -135,7 +139,7 @@ const StylePanel = forwardRef<HTMLDivElement, StylePanelProps>(({ ...rest }, ref
           paddingY="16"
           gap="24"
         >
-          <Flex textVariant="label-default-s" minWidth={3}>
+          <Flex textVariant="label-default-s" minWidth={3} onBackground="neutral-strong">
             Brand
           </Flex>
           <Scroller minWidth={0} fitWidth>
@@ -171,7 +175,7 @@ const StylePanel = forwardRef<HTMLDivElement, StylePanelProps>(({ ...rest }, ref
           paddingY="16"
           gap="24"
         >
-          <Flex textVariant="label-default-s" minWidth={3}>
+          <Flex textVariant="label-default-s" minWidth={3} onBackground="neutral-strong">
             Accent
           </Flex>
           <Scroller minWidth={0} fitWidth>
@@ -199,7 +203,7 @@ const StylePanel = forwardRef<HTMLDivElement, StylePanelProps>(({ ...rest }, ref
         </Flex>
 
         <Flex horizontal="between" vertical="center" fillWidth paddingX="24" paddingY="16" gap="24">
-          <Flex textVariant="label-default-s" minWidth={3}>
+          <Flex textVariant="label-default-s" minWidth={3} onBackground="neutral-strong">
             Neutral
           </Flex>
           <Scroller minWidth={0} fitWidth>
@@ -228,7 +232,9 @@ const StylePanel = forwardRef<HTMLDivElement, StylePanelProps>(({ ...rest }, ref
       </Column>
 
       <Column fillWidth paddingTop="12" paddingLeft="16" gap="4">
-        <Text variant="heading-strong-s">Solid style</Text>
+        <Text variant="heading-strong-s" onBackground="neutral-strong">
+          Solid style
+        </Text>
         <Text variant="body-default-s" onBackground="neutral-weak">
           Customize the appearance of interactive elements
         </Text>
@@ -243,7 +249,7 @@ const StylePanel = forwardRef<HTMLDivElement, StylePanelProps>(({ ...rest }, ref
           paddingY="16"
           gap="24"
         >
-          <Text variant="label-default-s">Style</Text>
+          <Text variant="label-default-s" onBackground="neutral-strong">Style</Text>
           <SegmentedControl
             maxWidth={22}
             minWidth={0}
@@ -310,7 +316,7 @@ const StylePanel = forwardRef<HTMLDivElement, StylePanelProps>(({ ...rest }, ref
           />
         </Flex>
         <Flex horizontal="between" vertical="center" fillWidth paddingX="24" paddingY="16" gap="24">
-          <Text variant="label-default-s">Effect</Text>
+          <Text variant="label-default-s" onBackground="neutral-strong">Effect</Text>
           <SegmentedControl
             maxWidth={22}
             minWidth={0}
@@ -363,7 +369,9 @@ const StylePanel = forwardRef<HTMLDivElement, StylePanelProps>(({ ...rest }, ref
         </Flex>
       </Column>
       <Column fillWidth paddingTop="12" paddingLeft="16" gap="4">
-        <Text variant="heading-strong-s">Advanced</Text>
+        <Text variant="heading-strong-s" onBackground="neutral-strong">
+          Advanced
+        </Text>
         <Text variant="body-default-s" onBackground="neutral-weak">
           Customize advanced styling options
         </Text>
@@ -378,7 +386,7 @@ const StylePanel = forwardRef<HTMLDivElement, StylePanelProps>(({ ...rest }, ref
           paddingY="16"
           gap="24"
         >
-          <Text variant="label-default-s">Surface</Text>
+          <Text variant="label-default-s" onBackground="neutral-strong">Surface</Text>
           <SegmentedControl
             maxWidth={22}
             minWidth={0}
@@ -411,7 +419,7 @@ const StylePanel = forwardRef<HTMLDivElement, StylePanelProps>(({ ...rest }, ref
           paddingY="16"
           gap="24"
         >
-          <Text variant="label-default-s">Scaling</Text>
+          <Text variant="label-default-s" onBackground="neutral-strong">Scaling</Text>
           <SegmentedControl
             maxWidth={22}
             minWidth={0}
@@ -459,7 +467,7 @@ const StylePanel = forwardRef<HTMLDivElement, StylePanelProps>(({ ...rest }, ref
           paddingY="16"
           gap="24"
         >
-          <Text variant="label-default-s">Data Style</Text>
+          <Text variant="label-default-s" onBackground="neutral-strong">Data Style</Text>
           <SegmentedControl
             maxWidth={22}
             minWidth={0}
@@ -489,7 +497,7 @@ const StylePanel = forwardRef<HTMLDivElement, StylePanelProps>(({ ...rest }, ref
           />
         </Flex>
         <Flex horizontal="between" vertical="center" fillWidth paddingX="24" paddingY="16" gap="24">
-          <Text variant="label-default-s">Transition</Text>
+          <Text variant="label-default-s" onBackground="neutral-strong">Transition</Text>
           <SegmentedControl
             maxWidth={22}
             minWidth={0}
