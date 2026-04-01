@@ -9,7 +9,7 @@ import React, {
   ReactNode,
 } from "react";
 import classNames from "classnames";
-import { Column, Row, Text } from ".";
+import { Column, Row, Text, Spinner } from ".";
 import styles from "./Input.module.scss";
 import { useDebounce } from "../hooks/useDebounce";
 
@@ -38,6 +38,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   characterCount?: boolean;
   cursor?: undefined | "interactive";
   validate?: (value: ReactNode) => ReactNode | null;
+  loading?: boolean;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -56,6 +57,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       hasPrefix,
       hasSuffix,
       characterCount,
+      loading = false,
       children,
       onFocus,
       onBlur,
@@ -204,7 +206,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               </Text>
             </Row>
           )}
-          {hasSuffix && (
+          {loading && (
+            <Row paddingRight="12" className={styles.suffix} position="static">
+              <Spinner size="s" />
+            </Row>
+          )}
+          {hasSuffix && !loading && (
             <Row paddingRight="12" className={styles.suffix} position="static">
               {hasSuffix}
             </Row>

@@ -30,6 +30,7 @@ export interface ContextMenuProps {
   isOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
   selectedOption?: string;
+  disabled?: boolean;
 }
 
 const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
@@ -46,6 +47,7 @@ const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
       maxWidth,
       fillWidth = false,
       placement = "bottom-end",
+      disabled = false,
       className,
       style,
       ...rest
@@ -82,6 +84,8 @@ const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
 
     const handleContextMenu = useCallback(
       (e: ReactMouseEvent) => {
+        if (disabled) return;
+        
         e.preventDefault();
         e.stopPropagation();
 
@@ -91,12 +95,14 @@ const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
         // Open the dropdown
         handleOpenChange(true);
       },
-      [handleOpenChange],
+      [disabled, handleOpenChange],
     );
 
     // Handle click events for MacBook support (Control+click)
     const handleClick = useCallback(
       (e: ReactMouseEvent) => {
+        if (disabled) return;
+        
         // Check if it's a control+click (common right-click equivalent on Mac)
         if (e.ctrlKey || e.metaKey) {
           e.preventDefault();
@@ -109,7 +115,7 @@ const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
           handleOpenChange(true);
         }
       },
-      [handleOpenChange],
+      [disabled, handleOpenChange],
     );
 
     // Close dropdown when clicking outside
@@ -297,7 +303,8 @@ const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
           onContextMenu={handleContextMenu}
           onClick={handleClick}
           className={className || ""}
-          style={style}
+          style={{...style, opacity: disabled ? 0.6 : undefined}}
+          aria-disabled={disabled}
         >
           {children}
           {isDropdownOpen &&

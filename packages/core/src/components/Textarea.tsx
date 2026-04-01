@@ -37,6 +37,7 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   characterCount?: boolean;
   resize?: "horizontal" | "vertical" | "both" | "none";
   validate?: (value: ReactNode) => ReactNode | null;
+  disabled?: boolean;
 }
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -56,6 +57,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       characterCount,
       resize = "vertical",
       validate,
+      disabled = false,
       children,
       onFocus,
       onBlur,
@@ -68,7 +70,6 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const [isFocused, setIsFocused] = useState(false);
     const [isFilled, setIsFilled] = useState(!!props.value);
     const [validationError, setValidationError] = useState<ReactNode | null>(null);
-    const [height, setHeight] = useState<number | undefined>(undefined);
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
     const debouncedValue = useDebounce(props.value, 1000);
 
@@ -118,6 +119,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     useEffect(() => {
       validateInput();
     }, [debouncedValue, validateInput]);
+
+    useEffect(() => {
+      setIsFilled(!!props.value);
+    }, [props.value]);
 
     useEffect(() => {
       if (lines === "auto") {
@@ -185,6 +190,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               id={id}
               rows={typeof lines === "number" ? lines : 1}
               placeholder={placeholder}
+              disabled={disabled}
               onFocus={handleFocus}
               onBlur={handleBlur}
               className={textareaClassNames + " scrollbar-minimal"}
@@ -193,7 +199,6 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               style={{
                 ...style,
                 resize: lines === "auto" ? "none" : resize,
-                height: height ? `${height}rem` : "auto",
               }}
               onChange={handleChange}
             />
@@ -210,29 +215,30 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               </Text>
             )}
             {children}
-            {characterCount && props.maxLength && (
-            <Row fillWidth paddingLeft="16" paddingY="8" className={styles.suffix}>
-              <Text
-                variant="label-default-s"
-                onBackground={
-                  props.maxLength - String(props.value || '').length <= 5
-                    ? "danger-weak"
-                    : props.maxLength - String(props.value || '').length <= 10
-                      ? "warning-weak"
-                      : "neutral-weak"
-                }
-              >
-                {props.maxLength - String(props.value || '').length}
-              </Text>
-            </Row>
-          )}
           </Column>
-          {hasSuffix && (
-            <Row paddingRight="12" className={styles.suffix}>
-              {hasSuffix}
-            </Row>
-          )}
+          
         </Row>
+        {characterCount && props.maxLength && (
+          <Row paddingLeft="16" paddingY="8" className={styles.suffix} position="static">
+            <Text
+              variant="label-default-s"
+              onBackground={
+                props.maxLength - String(props.value || '').length <= 5
+                  ? "danger-weak"
+                  : props.maxLength - String(props.value || '').length <= 10
+                    ? "warning-weak"
+                      : "neutral-weak"
+              }
+            >
+              {props.maxLength - String(props.value || '').length}
+            </Text>
+          </Row>
+        )}
+        {hasSuffix && (
+          <Row paddingRight="12" className={styles.suffix}>
+            {hasSuffix}
+          </Row>
+        )}
         {displayError && errorMessage !== false && (
           <Row paddingX="16" id={`${id}-error`} textVariant="body-default-s" onBackground="danger-weak">
             {displayError}
