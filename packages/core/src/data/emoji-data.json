@@ -3469,6 +3469,18 @@
       "tags": []
     },
     {
+      "char": "👍",
+      "description": "thumbs up",
+      "aliases": [
+        "+1",
+        "thumbsup"
+      ],
+      "tags": [
+        "approve",
+        "ok"
+      ]
+    },
+    {
       "char": "👎",
       "description": "thumbs down",
       "aliases": [

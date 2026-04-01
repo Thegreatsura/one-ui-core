@@ -6,5 +6,9 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.test.tsx"],
+    typecheck: {
+      enabled: true,
+      tsconfig: "./tsconfig.vitest.json",
+    },
   },
 });
