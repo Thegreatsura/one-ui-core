@@ -1,14 +1,12 @@
 "use client";
 
 import { useLayoutEffect, useRef, RefObject } from "react";
+import { activeScrollLocks, scrollLockState } from "../internal/scrollLockState";
 
 interface ScrollLockProps {
   enabled: boolean;
   allowScrollInElement?: RefObject<HTMLElement | null>;
 }
-
-const activeScrollLocks = new Set<symbol>();
-let previousBodyOverflow: string | null = null;
 
 export const ScrollLock = ({ enabled, allowScrollInElement }: ScrollLockProps) => {
   const scrollPositionRef = useRef({ x: 0, y: 0 });
@@ -23,7 +21,7 @@ export const ScrollLock = ({ enabled, allowScrollInElement }: ScrollLockProps) =
     scrollPositionRef.current = { x: scrollX, y: scrollY };
 
     if (activeScrollLocks.size === 0) {
-      previousBodyOverflow = document.body.style.overflow;
+      scrollLockState.previousBodyOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
     }
     activeScrollLocks.add(lockIdRef.current);
@@ -130,9 +128,9 @@ export const ScrollLock = ({ enabled, allowScrollInElement }: ScrollLockProps) =
 
     return () => {
       activeScrollLocks.delete(lockIdRef.current);
-      if (activeScrollLocks.size === 0 && previousBodyOverflow !== null) {
-        document.body.style.overflow = previousBodyOverflow;
-        previousBodyOverflow = null;
+      if (activeScrollLocks.size === 0 && scrollLockState.previousBodyOverflow !== null) {
+        document.body.style.overflow = scrollLockState.previousBodyOverflow;
+        scrollLockState.previousBodyOverflow = null;
       }
 
       window.removeEventListener("wheel", preventWheel, { capture: true });
