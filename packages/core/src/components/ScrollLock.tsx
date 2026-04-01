@@ -7,8 +7,12 @@ interface ScrollLockProps {
   allowScrollInElement?: RefObject<HTMLElement | null>;
 }
 
+const activeScrollLocks = new Set<symbol>();
+let previousBodyOverflow: string | null = null;
+
 export const ScrollLock = ({ enabled, allowScrollInElement }: ScrollLockProps) => {
   const scrollPositionRef = useRef({ x: 0, y: 0 });
+  const lockIdRef = useRef(Symbol("scroll-lock"));
 
   useLayoutEffect(() => {
     if (!enabled) return;
@@ -17,6 +21,12 @@ export const ScrollLock = ({ enabled, allowScrollInElement }: ScrollLockProps) =
     const scrollX = window.scrollX;
     const scrollY = window.scrollY;
     scrollPositionRef.current = { x: scrollX, y: scrollY };
+
+    if (activeScrollLocks.size === 0) {
+      previousBodyOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+    }
+    activeScrollLocks.add(lockIdRef.current);
 
     // Restore scroll position after a microtask to catch any scroll that happens during mount
     queueMicrotask(() => {
@@ -119,6 +129,12 @@ export const ScrollLock = ({ enabled, allowScrollInElement }: ScrollLockProps) =
     window.addEventListener("keydown", preventKeyScroll, { capture: true });
 
     return () => {
+      activeScrollLocks.delete(lockIdRef.current);
+      if (activeScrollLocks.size === 0 && previousBodyOverflow !== null) {
+        document.body.style.overflow = previousBodyOverflow;
+        previousBodyOverflow = null;
+      }
+
       window.removeEventListener("wheel", preventWheel, { capture: true });
       window.removeEventListener("touchstart", handleTouchStart, { capture: true });
       window.removeEventListener("touchmove", preventTouch, { capture: true });
