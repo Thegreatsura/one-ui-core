@@ -1,16 +1,6 @@
 import "@testing-library/jest-dom";
 import { cleanup } from "@testing-library/react";
-import type { ReactNode } from "react";
 import { afterEach, vi } from "vitest";
-
-vi.mock("react-dom", async () => {
-  const actual = await vi.importActual<typeof import("react-dom")>("react-dom");
-
-  return {
-    ...actual,
-    createPortal: (children: ReactNode) => children,
-  };
-});
 
 class ResizeObserverMock {
   observe() {}
