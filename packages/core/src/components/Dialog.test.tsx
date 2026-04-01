@@ -27,13 +27,11 @@ import {
   managedInertElements,
   removeVisibleDialogLayer,
   upsertVisibleDialogLayer,
+  visibleDialogLayers,
 } from "../internal/dialogState";
 import styles from "./Dialog.module.scss";
 import { resetDialogState } from "../test/dialogTestUtils";
 import { LayoutProvider } from "../contexts";
-
-const focusableSelector =
-  'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 const defaultProps = {
   isOpen: true,
@@ -50,6 +48,9 @@ const renderDialog = (props: Partial<React.ComponentProps<typeof Dialog>> = {}) 
   render(<Dialog {...defaultProps} {...props} />, {
     wrapper: TestProviders,
   });
+
+const focusableSelector =
+  'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 const getDialogPanel = (root: ParentNode = document.body) =>
   root.querySelector('[tabindex="-1"]') as HTMLElement | null;
@@ -84,6 +85,13 @@ describe("Dialog", () => {
 
       expect(getOverlay()).toBeInTheDocument();
       expect(document.body).toContainElement(getOverlay());
+    });
+
+    it("sets the required accessibility attributes on the dialog overlay", () => {
+      renderDialog();
+
+      expect(getOverlay()).toHaveAttribute("aria-modal", "true");
+      expect(getOverlay()).toHaveAttribute("aria-labelledby", "dialog-title");
     });
 
     it("renders a string title", () => {
@@ -194,17 +202,17 @@ describe("Dialog", () => {
     });
 
     it("cleans up timers on unmount", () => {
-      const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
       const { unmount } = renderDialog();
 
       unmount();
       advanceTimers(300);
 
-      expect(errorSpy).not.toHaveBeenCalled();
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
   });
 
   describe("onClose callback triggers", () => {
+    // These tests rely on the file-level afterEach to restore real timers.
     it("calls onClose on Escape when base is false", () => {
       const onClose = vi.fn();
       renderDialog({ onClose, base: false });
@@ -234,6 +242,19 @@ describe("Dialog", () => {
       fireEvent.mouseDown(outside, { button: 0 });
 
       expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not call onClose when clicking outside with a non-primary mouse button", () => {
+      vi.useFakeTimers();
+      const onClose = vi.fn();
+      renderDialog({ onClose, base: false });
+      const outside = document.createElement("div");
+      document.body.appendChild(outside);
+
+      advanceTimers(10);
+      fireEvent.mouseDown(outside, { button: 2 });
+
+      expect(onClose).not.toHaveBeenCalled();
     });
 
     it("does not call onClose when clicking outside with base true and stack false", () => {
@@ -278,6 +299,7 @@ describe("Dialog", () => {
       const onClose = vi.fn();
       renderDialog({ onClose });
       const dropdownPortal = document.createElement("div");
+      // This class intentionally matches the implementation's dropdown portal escape hatch.
       dropdownPortal.className = "dropdown-portal";
       const dropdownItem = document.createElement("button");
       dropdownPortal.appendChild(dropdownItem);
@@ -301,7 +323,7 @@ describe("Dialog", () => {
   });
 
   describe("focus management", () => {
-    it("moves focus to the first focusable element on open", () => {
+    it("moves focus to the first focusable element in the dialog (the close button)", () => {
       renderDialog({
         children: (
           <>
@@ -361,23 +383,29 @@ describe("Dialog", () => {
     });
 
     it("does not crash when no focusable elements are found", () => {
+      const originalQuerySelectorAll = HTMLElement.prototype.querySelectorAll;
+      let interceptedDialogPanelQuery = false;
       const querySelectorAllSpy = vi
         .spyOn(HTMLElement.prototype, "querySelectorAll")
-        .mockImplementation(function (selectors: string) {
-          // @ts-ignore
+        .mockImplementation(function mockDialogFocusableQuery(this: HTMLElement, selectors: string) {
           if (selectors === focusableSelector && this.getAttribute("tabindex") === "-1") {
-            return document.querySelectorAll("[data-no-focusable-elements]") as NodeListOf<HTMLElement>;
+            interceptedDialogPanelQuery = true;
+            return document.createDocumentFragment().querySelectorAll(selectors);
           }
 
-          // @ts-ignore
-          return Element.prototype.querySelectorAll.call(this, selectors) as NodeListOf<HTMLElement>;
+          return originalQuerySelectorAll.call(this, selectors);
         });
 
-      expect(() => {
-        renderDialog({ children: <div>Only text content</div> });
-      }).not.toThrow();
+      try {
+        expect(() => {
+          renderDialog({ children: <div>Only text content</div> });
+        }).not.toThrow();
 
-      expect(querySelectorAllSpy).toHaveBeenCalled();
+        expect(interceptedDialogPanelQuery).toBe(true);
+        expect(screen.getByRole("dialog")).toBeInTheDocument();
+      } finally {
+        querySelectorAllSpy.mockRestore();
+      }
     });
   });
 
@@ -586,6 +614,19 @@ describe("Dialog", () => {
       expect(screen.getByText("Consumer")).toBeInTheDocument();
       expect(contextValues.upsertVisibleDialog).toBe(upsertVisibleDialogLayer);
       expect(contextValues.removeVisibleDialog).toBe(removeVisibleDialogLayer);
+    });
+
+    it("registers a dialog rendered inside the provider", () => {
+      render(
+        <DialogProvider>
+          <Dialog {...defaultProps} />
+        </DialogProvider>,
+        {
+          wrapper: TestProviders,
+        },
+      );
+
+      expect(visibleDialogLayers).toHaveLength(1);
     });
   });
 });

@@ -31,6 +31,7 @@ const defineScrollMetrics = (
 };
 
 const createTouchEvent = (type: string, clientY: number) => {
+  // jsdom touch support is limited, so we emulate the minimal TouchEvent shape we need.
   const event = new Event(type, { bubbles: true, cancelable: true });
 
   Object.defineProperty(event, "touches", {
@@ -115,6 +116,52 @@ describe("ScrollLock", () => {
     expect(event.defaultPrevented).toBe(true);
   });
 
+  it("does not attach scroll locks when enabled is false", () => {
+    const addEventListenerSpy = vi.spyOn(window, "addEventListener");
+
+    try {
+      render(<ScrollLock enabled={false} />);
+
+      expect(addEventListenerSpy).not.toHaveBeenCalledWith("wheel", expect.any(Function), {
+        passive: false,
+        capture: true,
+      });
+      expect(addEventListenerSpy).not.toHaveBeenCalledWith("touchstart", expect.any(Function), {
+        passive: true,
+        capture: true,
+      });
+      expect(addEventListenerSpy).not.toHaveBeenCalledWith("touchmove", expect.any(Function), {
+        passive: false,
+        capture: true,
+      });
+      expect(addEventListenerSpy).not.toHaveBeenCalledWith("keydown", expect.any(Function), {
+        capture: true,
+      });
+
+      const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 80 });
+      document.body.dispatchEvent(event);
+
+      expect(event.defaultPrevented).toBe(false);
+      expect(document.body.style.overflow).toBe("");
+    } finally {
+      addEventListenerSpy.mockRestore();
+    }
+  });
+
+  it("prevents wheel events when no allowed scroll element is provided", () => {
+    render(
+      <>
+        <button type="button">Outside child</button>
+        <ScrollLock enabled />
+      </>,
+    );
+
+    const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 80 });
+    document.body.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+  });
+
   it("allows wheel events inside a scrollable allowed element", () => {
     const { getByTestId, getByRole } = render(
       <ScrollLockHarness enabled includeAllowedElement scrollable />,
@@ -127,6 +174,44 @@ describe("ScrollLock", () => {
     allowedChild.dispatchEvent(event);
 
     expect(event.defaultPrevented).toBe(false);
+  });
+
+  it("prevents wheel events at the bottom of a scrollable allowed element", () => {
+    const { getByTestId, getByRole } = render(
+      <ScrollLockHarness enabled includeAllowedElement scrollable />,
+    );
+    const scrollable = getByTestId("allowed-scrollable");
+    const allowedChild = getByRole("button", { name: "Allowed child" });
+    defineScrollMetrics(scrollable, { scrollTop: 400, scrollHeight: 400, clientHeight: 100 });
+
+    const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 80 });
+    allowedChild.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+  });
+
+  it("prevents wheel events at the top of a scrollable allowed element when scrolling upward", () => {
+    const { getByTestId, getByRole } = render(
+      <ScrollLockHarness enabled includeAllowedElement scrollable />,
+    );
+    const scrollable = getByTestId("allowed-scrollable");
+    const allowedChild = getByRole("button", { name: "Allowed child" });
+    defineScrollMetrics(scrollable, { scrollTop: 0, scrollHeight: 400, clientHeight: 100 });
+
+    const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: -80 });
+    allowedChild.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+  });
+
+  it("prevents wheel events inside a non-scrollable allowed element", () => {
+    const { getByRole } = render(<ScrollLockHarness enabled includeAllowedElement scrollable={false} />);
+    const allowedChild = getByRole("button", { name: "Allowed child" });
+
+    const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 80 });
+    allowedChild.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
   });
 
   it("prevents touch scroll outside the allowed element", () => {
@@ -157,21 +242,24 @@ describe("ScrollLock", () => {
     expect(moveEvent.defaultPrevented).toBe(false);
   });
 
-  it("prevents keyboard scroll keys outside the allowed element", () => {
-    const { getByRole } = render(
-      <ScrollLockHarness enabled includeAllowedElement scrollable />,
-    );
-    const outside = getByRole("button", { name: "Outside child" });
-    const event = new KeyboardEvent("keydown", {
-      bubbles: true,
-      cancelable: true,
-      key: "ArrowDown",
-    });
+  it.each(["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "])(
+    'prevents keyboard scroll key "%s" outside the allowed element',
+    (key) => {
+      const { getByRole } = render(
+        <ScrollLockHarness enabled includeAllowedElement scrollable />,
+      );
+      const outside = getByRole("button", { name: "Outside child" });
+      const event = new KeyboardEvent("keydown", {
+        bubbles: true,
+        cancelable: true,
+        key,
+      });
 
-    outside.dispatchEvent(event);
+      outside.dispatchEvent(event);
 
-    expect(event.defaultPrevented).toBe(true);
-  });
+      expect(event.defaultPrevented).toBe(true);
+    },
+  );
 
   it("allows keyboard scroll keys inside the allowed element", () => {
     const { getByRole } = render(
@@ -209,6 +297,7 @@ describe("ScrollLock", () => {
       capture: true,
     });
     expect(addSpy).toHaveBeenCalledWith("keydown", expect.any(Function), { capture: true });
+    // These assertions verify cleanup wiring, even though expect.any(Function) cannot prove identity equality.
     expect(removeSpy).toHaveBeenCalledWith("wheel", expect.any(Function), { capture: true });
     expect(removeSpy).toHaveBeenCalledWith("touchstart", expect.any(Function), { capture: true });
     expect(removeSpy).toHaveBeenCalledWith("touchmove", expect.any(Function), { capture: true });
