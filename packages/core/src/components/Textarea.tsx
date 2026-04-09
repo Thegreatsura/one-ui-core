@@ -18,6 +18,7 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   placeholder?: string;
   lines?: number | "auto";
+  componentHeight?: "xs" | "s" | "m" | "l" | "xl";
   error?: boolean;
   errorMessage?: ReactNode;
   description?: ReactNode;
@@ -47,6 +48,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       label,
       placeholder,
       lines = 3,
+      componentHeight = "m",
       error = false,
       errorMessage,
       description,
@@ -166,6 +168,21 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           vertical="stretch"
           className={classNames(
             styles.base,
+            {
+              [styles.xs]: componentHeight === "xs",
+            },
+            {
+              [styles.s]: componentHeight === "s",
+            },
+            {
+              [styles.m]: componentHeight === "m",
+            },
+            {
+              [styles.l]: componentHeight === "l",
+            },
+            {
+              [styles.xl]: componentHeight === "xl",
+            },
             lines !== "auto" && resize !== "none" && styles.textareaBase,
             radius === "none" ? "radius-none" : radius ? `radius-l-${radius}` : "radius-l",
           )}

@@ -58,12 +58,22 @@
     }
 }
 
+.xs {
+    min-height: var(--static-space-40);
+
+    .label {
+        &.floating {
+            top: calc(var(--static-space-6) - var(--static-space-2));
+        }
+    }
+}
+
 .s {
     min-height: var(--static-space-48);
 
     .label {
         &.floating {
-            top: calc(var(--static-space-4) - var(--static-space-1));
+            top: calc(var(--static-space-8) - var(--static-space-2));
         }
     }
 }
@@ -72,6 +82,26 @@
     .label {
         &.floating {
             top: calc(var(--static-space-8) - var(--static-space-2));
+        }
+    }
+}
+
+.l {
+    min-height: var(--static-space-64);
+
+    .label {
+        &.floating {
+            top: calc(var(--static-space-10) - var(--static-space-2));
+        }
+    }
+}
+
+.xl {
+    min-height: var(--static-space-72);
+
+    .label {
+        &.floating {
+            top: calc(var(--static-space-12) - var(--static-space-2));
         }
     }
 }

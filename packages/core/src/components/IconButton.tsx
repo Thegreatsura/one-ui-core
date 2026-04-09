@@ -11,7 +11,7 @@ import { IconName } from "../icons";
 interface CommonProps {
   icon?: IconName;
   id?: string;
-  size?: "s" | "m" | "l";
+  size?: "xs" | "s" | "m" | "l" | "xl";
   radius?:
     | "none"
     | "top"
@@ -22,6 +22,7 @@ interface CommonProps {
     | "top-right"
     | "bottom-right"
     | "bottom-left";
+  rounded?: boolean;
   tooltip?: string;
   tooltipPosition?: "top" | "bottom" | "left" | "right";
   variant?: "primary" | "secondary" | "tertiary" | "danger" | "ghost";
@@ -43,6 +44,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps | AnchorProps>(
       size = "m",
       id,
       radius,
+      rounded = false,
       tooltip,
       tooltipPosition = "top",
       variant = "primary",
@@ -64,6 +66,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps | AnchorProps>(
         href={href}
         ref={ref}
         disabled={disabled}
+        data-border={rounded ? "rounded" : undefined}
         className={classNames(
           buttonStyles.button,
           buttonStyles[variant],
