@@ -69,7 +69,10 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
   ) => {
     const dialogRef = useRef<HTMLDivElement>(null);
     const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
+    const wasOpenRef = useRef(isOpen);
     const dialogId = useId();
+    const dialogTitleId = `${dialogId}-title`;
     const [isVisible, setIsVisible] = useState(isOpen);
     const [isAnimating, setIsAnimating] = useState(false);
     const { upsertVisibleDialog, removeVisibleDialog } = useContext(DialogContext);
@@ -176,12 +179,24 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
 
     useEffect(() => {
       if (isOpen && dialogRef.current) {
+        previouslyFocusedElementRef.current =
+          document.activeElement instanceof HTMLElement ? document.activeElement : null;
         const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
         );
         const firstElement = focusableElements[0];
         firstElement?.focus();
       }
+    }, [isOpen]);
+
+    useEffect(() => {
+      if (wasOpenRef.current && !isOpen) {
+        const previousElement = previouslyFocusedElementRef.current;
+        if (previousElement && document.contains(previousElement)) {
+          previousElement.focus();
+        }
+      }
+      wasOpenRef.current = isOpen;
     }, [isOpen]);
 
     useEffect(() => {
@@ -237,7 +252,7 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
         padding="l"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="dialog-title"
+        aria-labelledby={dialogTitleId}
       >
         <Flex
           fill
@@ -296,11 +311,11 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
             >
               <Flex fillWidth horizontal="between" gap="8">
                 {typeof title === "string" ? (
-                  <Heading id="dialog-title" variant="heading-strong-l">
+                  <Heading id={dialogTitleId} variant="heading-strong-l">
                     {title}
                   </Heading>
                 ) : (
-                  title
+                  <div id={dialogTitleId}>{title}</div>
                 )}
                 <IconButton
                   icon="close"

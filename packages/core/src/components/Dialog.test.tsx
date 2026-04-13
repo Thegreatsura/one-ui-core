@@ -1,6 +1,7 @@
 import React from "react";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { renderToString } from "react-dom/server";
 
 vi.mock(".", async () => {
   const actual = await vi.importActual<typeof import(".")>(".");
@@ -89,9 +90,12 @@ describe("Dialog", () => {
 
     it("sets the required accessibility attributes on the dialog overlay", () => {
       renderDialog();
+      const overlay = getOverlay();
+      const labelledBy = overlay.getAttribute("aria-labelledby");
 
-      expect(getOverlay()).toHaveAttribute("aria-modal", "true");
-      expect(getOverlay()).toHaveAttribute("aria-labelledby", "dialog-title");
+      expect(overlay).toHaveAttribute("aria-modal", "true");
+      expect(labelledBy).toBeTruthy();
+      expect(labelledBy && document.getElementById(labelledBy)).toBeInTheDocument();
     });
 
     it("renders a string title", () => {
@@ -104,6 +108,31 @@ describe("Dialog", () => {
       renderDialog({ title: <span data-testid="custom-title">Custom title</span> });
 
       expect(screen.getByTestId("custom-title")).toBeInTheDocument();
+    });
+
+    it("uses unique aria-labelledby ids for stacked dialogs", () => {
+      renderDialog({ title: "Base dialog", base: true });
+      renderDialog({ title: "Stacked dialog", stack: true });
+
+      const [baseDialog, stackedDialog] = screen.getAllByRole("dialog");
+      const baseLabelId = baseDialog.getAttribute("aria-labelledby");
+      const stackedLabelId = stackedDialog.getAttribute("aria-labelledby");
+
+      expect(baseLabelId).toBeTruthy();
+      expect(stackedLabelId).toBeTruthy();
+      expect(baseLabelId).not.toBe(stackedLabelId);
+      expect(baseLabelId && document.getElementById(baseLabelId)).toBeInTheDocument();
+      expect(stackedLabelId && document.getElementById(stackedLabelId)).toBeInTheDocument();
+    });
+
+    it("labels the dialog correctly when title is a ReactNode", () => {
+      renderDialog({ title: <span>Custom title node</span> });
+
+      const overlay = getOverlay();
+      const labelledBy = overlay.getAttribute("aria-labelledby");
+
+      expect(labelledBy).toBeTruthy();
+      expect(labelledBy && document.getElementById(labelledBy)).toHaveTextContent("Custom title node");
     });
 
     it("renders description when provided", () => {
@@ -407,6 +436,24 @@ describe("Dialog", () => {
         querySelectorAllSpy.mockRestore();
       }
     });
+
+    it("restores focus to the opener after close", () => {
+      const opener = document.createElement("button");
+      opener.textContent = "Open dialog";
+      document.body.appendChild(opener);
+      opener.focus();
+
+      try {
+        const { rerender } = renderDialog();
+        expect(document.activeElement).toBe(screen.getByRole("button", { name: /close/i }));
+
+        rerender(<Dialog {...defaultProps} isOpen={false} />);
+
+        expect(document.activeElement).toBe(opener);
+      } finally {
+        opener.remove();
+      }
+    });
   });
 
   describe("inert state management", () => {
@@ -627,6 +674,18 @@ describe("Dialog", () => {
       );
 
       expect(visibleDialogLayers).toHaveLength(1);
+    });
+  });
+
+  describe("SSR safety", () => {
+    it("does not throw during server render when closed", () => {
+      expect(() => {
+        renderToString(
+          <LayoutProvider>
+            <Dialog {...defaultProps} isOpen={false} />
+          </LayoutProvider>,
+        );
+      }).not.toThrow();
     });
   });
 });

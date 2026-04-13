@@ -71,6 +71,29 @@ const ScrollLockHarness = ({
   );
 };
 
+const DualScrollLockHarness = () => {
+  const baseAllowedRef = useRef<HTMLDivElement>(null);
+  const topAllowedRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <>
+      <div ref={baseAllowedRef} data-testid="base-allowed-root">
+        <div data-testid="base-scrollable" style={{ overflowY: "auto" }}>
+          <button type="button">Base allowed child</button>
+        </div>
+      </div>
+      <div ref={topAllowedRef} data-testid="top-allowed-root">
+        <div data-testid="top-scrollable" style={{ overflowY: "auto" }}>
+          <button type="button">Top allowed child</button>
+        </div>
+      </div>
+      <button type="button">Outside child</button>
+      <ScrollLock enabled allowScrollInElement={baseAllowedRef} />
+      <ScrollLock enabled allowScrollInElement={topAllowedRef} />
+    </>
+  );
+};
+
 beforeEach(() => {
   resetScrollLockTestState();
   document.body.innerHTML = "";
@@ -102,6 +125,29 @@ describe("ScrollLock", () => {
 
     second.rerender(<ScrollLock enabled={false} />);
     expect(document.body.style.overflow).toBe("");
+  });
+
+  it("allows wheel scrolling in the top-layer allowed container with multiple locks", () => {
+    const { getByRole, getByTestId } = render(<DualScrollLockHarness />);
+    const topScrollable = getByTestId("top-scrollable");
+    const topAllowedChild = getByRole("button", { name: "Top allowed child" });
+
+    defineScrollMetrics(topScrollable, { scrollTop: 10, scrollHeight: 600, clientHeight: 100 });
+
+    const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 60 });
+    topAllowedChild.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  it("keeps outside scrolling blocked with multiple locks and different allowed containers", () => {
+    const { getByRole } = render(<DualScrollLockHarness />);
+    const outside = getByRole("button", { name: "Outside child" });
+    const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 60 });
+
+    outside.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
   });
 
   describe("layout shift prevention", () => {

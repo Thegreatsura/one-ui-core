@@ -1,7 +1,11 @@
 "use client";
 
 import { useLayoutEffect, useRef, RefObject } from "react";
-import { activeScrollLocks, scrollLockState } from "../internal/scrollLockState";
+import {
+  activeScrollLockAllowElements,
+  activeScrollLocks,
+  scrollLockState,
+} from "../internal/scrollLockState";
 
 interface ScrollLockProps {
   enabled: boolean;
@@ -39,32 +43,30 @@ export const ScrollLock = ({ enabled, allowScrollInElement }: ScrollLockProps) =
       window.scrollTo(scrollX, scrollY);
     });
 
-    // Check if an element can scroll in a given direction
     const canScroll = (el: HTMLElement, deltaY: number): boolean => {
       const style = window.getComputedStyle(el);
       const overflowY = style.overflowY;
-      
-      // Element must have scrollable overflow
-      if (overflowY !== 'auto' && overflowY !== 'scroll') {
+
+      if (overflowY !== "auto" && overflowY !== "scroll") {
         return false;
       }
-      
+
       const { scrollTop, scrollHeight, clientHeight } = el;
       const hasOverflow = scrollHeight > clientHeight;
       if (!hasOverflow) return false;
-      
-      // Check if we can scroll in the direction of the wheel
+
       if (deltaY > 0) {
-        // Scrolling down - can we scroll more?
         return scrollTop + clientHeight < scrollHeight;
       } else {
-        // Scrolling up - are we not at the top?
         return scrollTop > 0;
       }
     };
 
-    // Find the scrollable parent of a target element within the allowed container
-    const findScrollableParent = (target: HTMLElement, container: HTMLElement, deltaY: number): HTMLElement | null => {
+    const findScrollableParent = (
+      target: HTMLElement,
+      container: HTMLElement,
+      deltaY: number,
+    ): HTMLElement | null => {
       let current: HTMLElement | null = target;
       while (current && container.contains(current)) {
         if (canScroll(current, deltaY)) {
@@ -79,48 +81,64 @@ export const ScrollLock = ({ enabled, allowScrollInElement }: ScrollLockProps) =
       return null;
     };
 
-    // Prevent wheel scroll
-    const preventWheel = (e: WheelEvent) => {
-      // Allow scroll if it's inside the allowed element AND that element can scroll
-      if (allowScrollInElement?.current) {
-        const target = e.target as HTMLElement;
-        if (allowScrollInElement.current.contains(target)) {
-          const scrollable = findScrollableParent(target, allowScrollInElement.current, e.deltaY);
-          if (scrollable) {
-            return; // Allow scroll within the scrollable element
-          }
+    const canAnyAllowedElementScroll = (target: HTMLElement, deltaY: number): boolean => {
+      for (const allowedElementRef of activeScrollLockAllowElements.values()) {
+        const container = allowedElementRef?.current;
+        if (!container || !container.contains(target)) {
+          continue;
+        }
+
+        if (findScrollableParent(target, container, deltaY)) {
+          return true;
         }
       }
+
+      return false;
+    };
+
+    const preventWheel = (e: WheelEvent) => {
+      if (!(e.target instanceof HTMLElement)) {
+        e.preventDefault();
+        return;
+      }
+      const target = e.target;
+      if (canAnyAllowedElementScroll(target, e.deltaY)) {
+        return;
+      }
+
       e.preventDefault();
     };
 
-    // Prevent touch scroll
     let touchStartY = 0;
     const handleTouchStart = (e: TouchEvent) => {
       touchStartY = e.touches[0].clientY;
     };
 
     const preventTouch = (e: TouchEvent) => {
-      if (allowScrollInElement?.current) {
-        const target = e.target as HTMLElement;
-        if (allowScrollInElement.current.contains(target)) {
-          const deltaY = touchStartY - e.touches[0].clientY;
-          const scrollable = findScrollableParent(target, allowScrollInElement.current, deltaY);
-          if (scrollable) {
-            return;
-          }
-        }
+      if (!(e.target instanceof HTMLElement)) {
+        e.preventDefault();
+        return;
       }
+      const target = e.target;
+      const deltaY = touchStartY - e.touches[0].clientY;
+      if (canAnyAllowedElementScroll(target, deltaY)) {
+        return;
+      }
+
       e.preventDefault();
     };
 
-    // Prevent keyboard scrolling
     const preventKeyScroll = (e: KeyboardEvent) => {
       const scrollKeys = ["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "];
       if (scrollKeys.includes(e.key)) {
-        if (allowScrollInElement?.current) {
-          const target = e.target as HTMLElement;
-          if (allowScrollInElement.current.contains(target)) {
+        if (!(e.target instanceof HTMLElement)) {
+          e.preventDefault();
+          return;
+        }
+        const target = e.target;
+        for (const allowedElementRef of activeScrollLockAllowElements.values()) {
+          const container = allowedElementRef?.current;
+          if (container && container.contains(target)) {
             return;
           }
         }
@@ -128,7 +146,8 @@ export const ScrollLock = ({ enabled, allowScrollInElement }: ScrollLockProps) =
       }
     };
 
-    // Use capture phase to intercept events before they reach targets
+    activeScrollLockAllowElements.set(lockIdRef.current, allowScrollInElement);
+
     window.addEventListener("wheel", preventWheel, { passive: false, capture: true });
     window.addEventListener("touchstart", handleTouchStart, { passive: true, capture: true });
     window.addEventListener("touchmove", preventTouch, { passive: false, capture: true });
@@ -136,6 +155,7 @@ export const ScrollLock = ({ enabled, allowScrollInElement }: ScrollLockProps) =
 
     return () => {
       activeScrollLocks.delete(lockIdRef.current);
+      activeScrollLockAllowElements.delete(lockIdRef.current);
       if (activeScrollLocks.size === 0 && scrollLockState.previousBodyOverflow !== null) {
         document.body.style.overflow = scrollLockState.previousBodyOverflow;
         document.body.style.paddingRight = scrollLockState.previousBodyPaddingRight ?? "";
