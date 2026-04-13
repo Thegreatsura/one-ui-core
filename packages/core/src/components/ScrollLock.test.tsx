@@ -127,6 +127,31 @@ describe("ScrollLock", () => {
     expect(document.body.style.overflow).toBe("");
   });
 
+  it("attaches global listeners once for multiple locks and removes them after the last release", () => {
+    const addSpy = vi.spyOn(window, "addEventListener");
+    const removeSpy = vi.spyOn(window, "removeEventListener");
+    const first = render(<ScrollLock enabled />);
+    const second = render(<ScrollLock enabled />);
+
+    const countCalls = (spy: ReturnType<typeof vi.spyOn>, eventName: string) =>
+      spy.mock.calls.filter(([name]) => name === eventName).length;
+
+    expect(countCalls(addSpy, "wheel")).toBe(1);
+    expect(countCalls(addSpy, "touchstart")).toBe(1);
+    expect(countCalls(addSpy, "touchmove")).toBe(1);
+    expect(countCalls(addSpy, "keydown")).toBe(1);
+    expect(countCalls(removeSpy, "wheel")).toBe(0);
+
+    first.rerender(<ScrollLock enabled={false} />);
+    expect(countCalls(removeSpy, "wheel")).toBe(0);
+
+    second.rerender(<ScrollLock enabled={false} />);
+    expect(countCalls(removeSpy, "wheel")).toBe(1);
+    expect(countCalls(removeSpy, "touchstart")).toBe(1);
+    expect(countCalls(removeSpy, "touchmove")).toBe(1);
+    expect(countCalls(removeSpy, "keydown")).toBe(1);
+  });
+
   it("allows wheel scrolling in the top-layer allowed container with multiple locks", () => {
     const { getByRole, getByTestId } = render(<DualScrollLockHarness />);
     const topScrollable = getByTestId("top-scrollable");
