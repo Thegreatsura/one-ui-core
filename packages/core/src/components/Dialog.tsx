@@ -81,6 +81,10 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
       typeof document === "undefined" ? null : document.body,
     );
     const { upsertVisibleDialog, removeVisibleDialog } = useContext(DialogContext);
+    const isCurrentDialogTopVisibleLayer = useCallback(
+      () => getTopVisibleDialogLayer()?.id === dialogId,
+      [dialogId],
+    );
 
     const getPortalContainer = useCallback((): HTMLElement | null => {
       let portalContainer: HTMLElement | null = dialogRef.current;
@@ -155,7 +159,7 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
 
     const handleKeyDown = useCallback(
       (event: KeyboardEvent) => {
-        if (event.key === "Escape" && !base) {
+        if (event.key === "Escape" && !base && isCurrentDialogTopVisibleLayer()) {
           onClose();
         }
         if (event.key === "Tab" && dialogRef.current) {
@@ -177,7 +181,7 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
           }
         }
       },
-      [onClose, base],
+      [base, isCurrentDialogTopVisibleLayer, onClose],
     );
 
     useEffect(() => {
@@ -254,7 +258,7 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
         }
 
         if (!dialogRef.current?.contains(event.target as Node)) {
-          if (stack || !base) {
+          if ((stack || !base) && isCurrentDialogTopVisibleLayer()) {
             event.preventDefault();
             onClose();
           }
@@ -271,7 +275,7 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
           document.removeEventListener("mousedown", handleClickOutside, { capture: true });
         };
       }
-    }, [isVisible, onClose, stack, base]);
+    }, [base, isCurrentDialogTopVisibleLayer, isVisible, onClose, stack]);
 
     if (!isVisible || !portalContainer) return null;
 

@@ -260,6 +260,45 @@ describe("Dialog", () => {
       expect(onClose).not.toHaveBeenCalled();
     });
 
+    it("closes only the topmost stacked non-base dialog on Escape", () => {
+      vi.useFakeTimers();
+
+      const StackedEscapeHarness = () => {
+        const [isFirstOpen, setIsFirstOpen] = React.useState(true);
+        const [isSecondOpen, setIsSecondOpen] = React.useState(true);
+
+        return (
+          <>
+            <Dialog
+              {...defaultProps}
+              title="First stacked dialog"
+              isOpen={isFirstOpen}
+              stack
+              onClose={() => setIsFirstOpen(false)}
+            />
+            <Dialog
+              {...defaultProps}
+              title="Second stacked dialog"
+              isOpen={isSecondOpen}
+              stack
+              onClose={() => setIsSecondOpen(false)}
+            />
+          </>
+        );
+      };
+
+      render(<StackedEscapeHarness />, { wrapper: TestProviders });
+
+      expect(screen.getByText("First stacked dialog")).toBeInTheDocument();
+      expect(screen.getByText("Second stacked dialog")).toBeInTheDocument();
+
+      fireEvent.keyDown(document, { key: "Escape" });
+      advanceTimers(300);
+
+      expect(screen.getByText("First stacked dialog")).toBeInTheDocument();
+      expect(screen.queryByText("Second stacked dialog")).not.toBeInTheDocument();
+    });
+
     it("calls onClose when clicking outside while open and not base", () => {
       vi.useFakeTimers();
       const onClose = vi.fn();
@@ -310,6 +349,49 @@ describe("Dialog", () => {
       fireEvent.mouseDown(outside, { button: 0 });
 
       expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("closes only the topmost stacked non-base dialog on outside click", () => {
+      vi.useFakeTimers();
+
+      const StackedOutsideClickHarness = () => {
+        const [isFirstOpen, setIsFirstOpen] = React.useState(true);
+        const [isSecondOpen, setIsSecondOpen] = React.useState(true);
+
+        return (
+          <>
+            <Dialog
+              {...defaultProps}
+              title="First outside dialog"
+              isOpen={isFirstOpen}
+              stack
+              onClose={() => setIsFirstOpen(false)}
+            />
+            <Dialog
+              {...defaultProps}
+              title="Second outside dialog"
+              isOpen={isSecondOpen}
+              stack
+              onClose={() => setIsSecondOpen(false)}
+            />
+          </>
+        );
+      };
+
+      render(<StackedOutsideClickHarness />, { wrapper: TestProviders });
+
+      const outside = document.createElement("div");
+      document.body.appendChild(outside);
+
+      expect(screen.getByText("First outside dialog")).toBeInTheDocument();
+      expect(screen.getByText("Second outside dialog")).toBeInTheDocument();
+
+      advanceTimers(10);
+      fireEvent.mouseDown(outside, { button: 0 });
+      advanceTimers(300);
+
+      expect(screen.getByText("First outside dialog")).toBeInTheDocument();
+      expect(screen.queryByText("Second outside dialog")).not.toBeInTheDocument();
     });
 
     it("does not call onClose when clicking inside the dialog", () => {
