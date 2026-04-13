@@ -7,14 +7,21 @@
     background: var(--static-transparent);
     color: var(--neutral-on-background-strong);
     transition: var(--transition-micro-medium);
-	user-select: none;
+    user-select: none;
     white-space: nowrap;
-  
-    &:hover, &:focus {
+
+    &:focus-visible {
         background: var(--neutral-alpha-weak);
         border-color: var(--neutral-alpha-weak);
     }
-  
+
+    @media (hover: hover) and (pointer: fine) {
+        &:hover {
+            background: var(--neutral-alpha-weak);
+            border-color: var(--neutral-alpha-weak);
+        }
+    }
+
     &.selected {
         background-color: var(--neutral-alpha-medium);
         border-color: var(--neutral-alpha-weak);
@@ -23,9 +30,9 @@
     &:disabled {
         background: var(--neutral-alpha-weak);
         color: var(--neutral-on-background-medium);
-		border: none;
-		pointer-events: none;
-		cursor: not-allowed;
+        border: none;
+        pointer-events: none;
+        cursor: not-allowed;
     }
 }
 
@@ -40,7 +47,7 @@
     min-height: var(--static-space-32);
     padding: var(--static-space-4) var(--static-space-8);
 }
-  
+
 .l {
     height: var(--static-space-40);
     min-height: var(--static-space-40);
