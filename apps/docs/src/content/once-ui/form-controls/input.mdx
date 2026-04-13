@@ -290,6 +290,48 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   ]}
 />
 
+## Radius
+
+You can use the `radius` prop to apply custom radius to sides or corners. It works well with the `Column` component's `-1` gap to create a seamless connection between inputs.
+
+<CodeBlock
+  marginTop="16"
+  marginBottom="24"
+  preview={
+    <Column fillWidth gap="-1">
+      <Input
+        radius="top"
+        id="custom-input-name"
+        placeholder="Full name"
+      />
+      <Input
+        radius="bottom"
+        id="custom-input-username"
+        placeholder="Username"
+      />
+    </Column>
+  }
+  codes={[
+    {
+      code:
+`<Column fillWidth gap="16">
+    <Input
+      radius="top"
+      id="input-1"
+      placeholder="Name"
+    />
+    <Input
+      radius="bottom"
+      id="input-2"
+      placeholder="Name"
+    />
+</Column>`,
+      language: "tsx",
+      label: "Custom styling"
+    }
+  ]}
+/>
+
 ## NumberInput
 
 The `NumberInput` component provides a specialized input for numeric values with increment and decrement buttons. It supports min, max, and step values to control the range and increments.
@@ -414,48 +456,6 @@ const handleChange = (newTags: string[]) => {
   ]}
 />
 
-## Styling
-
-You can use the `radius` prop to apply custom radius to sides or corners. It works well with the `Column` component's `-1` gap to create a seamless connection between inputs.
-
-<CodeBlock
-  marginTop="16"
-  marginBottom="24"
-  preview={
-    <Column fillWidth gap="-1">
-      <Input
-        radius="top"
-        id="custom-input-name"
-        placeholder="Full name"
-      />
-      <Input
-        radius="bottom"
-        id="custom-input-username"
-        placeholder="Username"
-      />
-    </Column>
-  }
-  codes={[
-    {
-      code:
-`<Column fillWidth gap="16">
-    <Input
-      radius="top"
-      id="input-1"
-      placeholder="Name"
-    />
-    <Input
-      radius="bottom"
-      id="input-2"
-      placeholder="Name"
-    />
-</Column>`,
-      language: "tsx",
-      label: "Custom styling"
-    }
-  ]}
-/>
-
 ## API reference
 
 <PropsTable
@@ -463,7 +463,7 @@ You can use the `radius` prop to apply custom radius to sides or corners. It wor
     ["id", "string"],
     ["label", "string"],
     ["placeholder", "string"],
-    ["height", ["s", "m"], "m"],
+    ["height", ["xs", "s", "m", "l", "xl"], "m"],
     ["error", "boolean", "false"],
     ["errorMessage", "ReactNode"],
     ["description", "ReactNode"],

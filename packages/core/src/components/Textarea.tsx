@@ -168,21 +168,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           vertical="stretch"
           className={classNames(
             styles.base,
-            {
-              [styles.xs]: height === "xs",
-            },
-            {
-              [styles.s]: height === "s",
-            },
-            {
-              [styles.m]: height === "m",
-            },
-            {
-              [styles.l]: height === "l",
-            },
-            {
-              [styles.xl]: height === "xl",
-            },
+            height && styles[height],
             lines !== "auto" && resize !== "none" && styles.textareaBase,
             radius === "none" ? "radius-none" : radius ? `radius-l-${radius}` : "radius-l",
           )}
