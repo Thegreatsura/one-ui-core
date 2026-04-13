@@ -23,7 +23,7 @@ interface CommonProps {
     | "bottom-right"
     | "bottom-left";
   rounded?: boolean;
-  tooltip?: string;
+  tooltip?: ReactNode;
   tooltipPosition?: "top" | "bottom" | "left" | "right";
   variant?: "primary" | "secondary" | "tertiary" | "danger" | "ghost";
   loading?: boolean;
