@@ -8,11 +8,14 @@ interface DropdownProps extends Omit<React.ComponentProps<typeof Row>, "onSelect
   children?: ReactNode;
   onEscape?: () => void;
   onSelect?: (event: string) => void;
+  disabled?: boolean;
 }
 
 const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
-  ({ selectedOption, className, children, onEscape, onSelect, ...flex }, ref) => {
+  ({ selectedOption, className, children, onEscape, onSelect, disabled = false, ...flex }, ref) => {
     const handleSelect = (event: SyntheticEvent<HTMLDivElement>) => {
+      if (disabled) return;
+      
       // Only handle clicks on elements that have a data-value attribute
       const target = event.target as HTMLElement;
       const value =
@@ -33,6 +36,9 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
         border="neutral-medium"
         background="surface"
         overflow="hidden"
+        className={disabled ? "cursor-not-allowed" : undefined}
+        style={{ opacity: disabled ? 0.6 : undefined }}
+        aria-disabled={disabled}
         {...flex}
       >
         <Column flex={1} overflowY="auto" gap="2">

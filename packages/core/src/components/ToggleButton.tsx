@@ -10,7 +10,7 @@ interface CommonProps {
   label?: ReactNode;
   selected?: boolean;
   variant?: "ghost" | "outline";
-  size?: "s" | "m" | "l";
+  size?: "s" | "m" | "l" | "xl";
   radius?:
     | "none"
     | "top"
@@ -21,6 +21,7 @@ interface CommonProps {
     | "top-right"
     | "bottom-right"
     | "bottom-left";
+  rounded?: boolean;
   horizontal?: "start" | "center" | "end" | "between";
   fillWidth?: boolean;
   weight?: "default" | "strong";
@@ -43,6 +44,7 @@ const ToggleButton = forwardRef<HTMLElement, ToggleButtonProps>(
       variant = "ghost",
       size = "m",
       radius,
+      rounded = false,
       horizontal = "center",
       fillWidth = false,
       weight = "default",
@@ -61,6 +63,7 @@ const ToggleButton = forwardRef<HTMLElement, ToggleButtonProps>(
       <ElementType
         ref={ref}
         href={href}
+        data-border={rounded ? "rounded" : undefined}
         className={classNames(
           styles.button,
           styles[variant],

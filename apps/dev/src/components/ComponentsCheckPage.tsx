@@ -290,6 +290,7 @@ export default function ComponentsCheck() {
     ];
 
     return (
+        <>
         <Column fill padding="l" gap="xl">
             <Column gap="m" maxWidth="xl">
                 <Grid columns={3} gap="s">
@@ -368,6 +369,49 @@ export default function ComponentsCheck() {
                         </Column>
                     ))}
             </Grid>
+            
+            {/* Size Variant Tests */}
+            <Column padding="24" gap="16" background="neutral-alpha-weak" radius="m">
+            <Heading as="h2" variant="heading-default-l">Size Variants Test</Heading>
+            
+            <Column gap="12">
+                <Text variant="body-default-m">IconButton Sizes:</Text>
+                <Row gap="8" vertical="center">
+                    <IconButton size="xs" icon="refresh" />
+                    <IconButton size="s" icon="refresh" />
+                    <IconButton size="m" icon="refresh" />
+                    <IconButton size="l" icon="refresh" />
+                    <IconButton size="xl" icon="refresh" />
+                </Row>
+                <Text variant="body-default-m">IconButton Sizes (Rounded):</Text>
+                <Row gap="8" vertical="center">
+                    <IconButton rounded size="xs" icon="refresh" />
+                    <IconButton rounded size="s" icon="refresh" />
+                    <IconButton rounded size="m" icon="refresh" />
+                    <IconButton rounded size="l" icon="refresh" />
+                    <IconButton rounded size="xl" icon="refresh" />
+                </Row>
+            </Column>
+            
+            <Column gap="8">
+                <Text variant="body-default-m">Input Heights:</Text>
+                <Input id="test-xs" componentHeight="xs" placeholder="XS Input" />
+                <Input id="test-s" componentHeight="s" placeholder="S Input" />
+                <Input id="test-m" componentHeight="m" placeholder="M Input" />
+                <Input id="test-l" componentHeight="l" placeholder="L Input" />
+                <Input id="test-xl" componentHeight="xl" placeholder="XL Input" />
+            </Column>
+            
+            <Column gap="8">
+                <Text variant="body-default-m">Textarea Heights:</Text>
+                <Textarea id="textarea-xs" componentHeight="xs" placeholder="XS Textarea" />
+                <Textarea id="textarea-s" componentHeight="s" placeholder="S Textarea" />
+                <Textarea id="textarea-m" componentHeight="m" placeholder="M Textarea" />
+                <Textarea id="textarea-l" componentHeight="l" placeholder="L Textarea" />
+                <Textarea id="textarea-xl" componentHeight="xl" placeholder="XL Textarea" />
+            </Column>
         </Column>
+        </Column>
+        </>
     );
 }
