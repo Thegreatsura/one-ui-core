@@ -116,6 +116,13 @@ export const removeVisibleDialogLayer = (id: string) => {
   syncVisibleDialogLayerInertState();
 };
 
+export const getTopVisibleDialogLayer = (): VisibleDialogLayer | null => {
+  if (visibleDialogLayers.length === 0) return null;
+
+  sortVisibleDialogLayersByPriority();
+  return visibleDialogLayers[visibleDialogLayers.length - 1] ?? null;
+};
+
 export const DialogContext = React.createContext<{
   upsertVisibleDialog: (layer: VisibleDialogLayer) => void;
   removeVisibleDialog: (id: string) => void;

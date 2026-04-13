@@ -17,6 +17,7 @@ import { Column, Flex, Heading, IconButton, ScrollLock, Text } from ".";
 import {
   DialogContext,
   VisibleDialogLayer,
+  getTopVisibleDialogLayer,
   removeVisibleDialogLayer,
   upsertVisibleDialogLayer,
 } from "../internal/dialogState";
@@ -204,13 +205,21 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
     const restoreFocus = useCallback(() => {
       if (focusRestoredRef.current) return;
 
+      const topLayer = getTopVisibleDialogLayer();
+      const isTopLayer = topLayer?.id === dialogId;
+      const hasOtherVisibleDialog = topLayer !== null && !isTopLayer;
+
+      if (hasOtherVisibleDialog) {
+        return;
+      }
+
       const previousElement = previouslyFocusedElementRef.current;
       if (previousElement && document.contains(previousElement)) {
         previousElement.focus();
       }
 
       focusRestoredRef.current = true;
-    }, []);
+    }, [dialogId]);
 
     useEffect(() => {
       if (wasVisibleRef.current && !isVisible) {
