@@ -530,6 +530,19 @@ describe("Dialog", () => {
       expect(basePanel.inert).toBe(false);
     });
 
+    it("uses visual stacking priority even when open order differs", () => {
+      renderDialog({ title: "Stacked dialog", stack: true });
+      renderDialog({ title: "Base dialog", base: true });
+
+      const stackedOverlay = screen.getByText("Stacked dialog").closest('[role="dialog"]') as HTMLElement;
+      const baseOverlay = screen.getByText("Base dialog").closest('[role="dialog"]') as HTMLElement;
+      const stackedPanel = getDialogPanel(stackedOverlay) as HTMLElement;
+      const basePanel = getDialogPanel(baseOverlay) as HTMLElement;
+
+      expect(stackedPanel.inert).toBe(false);
+      expect(basePanel.inert).toBe(true);
+    });
+
     it("does not leave orphaned inert elements after rapid open and close", () => {
       vi.useFakeTimers();
       const sibling = document.createElement("div");

@@ -109,6 +109,7 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
         id: dialogId,
         dialogElement: dialogRef.current,
         portalContainer,
+        priority: base ? 8 : 9,
       });
     }, [dialogId, getPortalContainer, isVisible, removeVisibleDialog, upsertVisibleDialog]);
 
