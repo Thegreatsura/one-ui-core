@@ -31,7 +31,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             fontSize: dataStyle.tick.fontSize,
             line: dataStyle.tick.line
           }}
-          >
+        >
           <ToastProvider>
             <IconProvider icons={iconLibrary}>
               {children}
