@@ -395,20 +395,20 @@ export default function ComponentsCheck() {
             
             <Column gap="8">
                 <Text variant="body-default-m">Input Heights:</Text>
-                <Input id="test-xs" componentHeight="xs" placeholder="XS Input" />
-                <Input id="test-s" componentHeight="s" placeholder="S Input" />
-                <Input id="test-m" componentHeight="m" placeholder="M Input" />
-                <Input id="test-l" componentHeight="l" placeholder="L Input" />
-                <Input id="test-xl" componentHeight="xl" placeholder="XL Input" />
+                <Input id="test-xs" height="xs" placeholder="XS Input" />
+                <Input id="test-s" height="s" placeholder="S Input" />
+                <Input id="test-m" height="m" placeholder="M Input" />
+                <Input id="test-l" height="l" placeholder="L Input" />
+                <Input id="test-xl" height="xl" placeholder="XL Input" />
             </Column>
             
             <Column gap="8">
                 <Text variant="body-default-m">Textarea Heights:</Text>
-                <Textarea id="textarea-xs" componentHeight="xs" placeholder="XS Textarea" />
-                <Textarea id="textarea-s" componentHeight="s" placeholder="S Textarea" />
-                <Textarea id="textarea-m" componentHeight="m" placeholder="M Textarea" />
-                <Textarea id="textarea-l" componentHeight="l" placeholder="L Textarea" />
-                <Textarea id="textarea-xl" componentHeight="xl" placeholder="XL Textarea" />
+                <Textarea id="textarea-xs" height="xs" placeholder="XS Textarea" />
+                <Textarea id="textarea-s" height="s" placeholder="S Textarea" />
+                <Textarea id="textarea-m" height="m" placeholder="M Textarea" />
+                <Textarea id="textarea-l" height="l" placeholder="L Textarea" />
+                <Textarea id="textarea-xl" height="xl" placeholder="XL Textarea" />
             </Column>
         </Column>
         </Column>

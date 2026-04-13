@@ -17,7 +17,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   id: string;
   label?: string;
   placeholder?: string;
-  componentHeight?: "xs" | "s" | "m" | "l" | "xl";
+  height?: "xs" | "s" | "m" | "l" | "xl";
   error?: boolean;
   errorMessage?: ReactNode;
   description?: ReactNode;
@@ -47,7 +47,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       id,
       label,
       placeholder,
-      componentHeight = "m",
+      height = "m",
       error = false,
       errorMessage,
       description,
@@ -151,19 +151,19 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           className={classNames(
             styles.base,
             {
-              [styles.xs]: componentHeight === "xs",
+              [styles.xs]: height === "xs",
             },
             {
-              [styles.s]: componentHeight === "s",
+              [styles.s]: height === "s",
             },
             {
-              [styles.m]: componentHeight === "m",
+              [styles.m]: height === "m",
             },
             {
-              [styles.l]: componentHeight === "l",
+              [styles.l]: height === "l",
             },
             {
-              [styles.xl]: componentHeight === "xl",
+              [styles.xl]: height === "xl",
             },
             radius === "none" ? "radius-none" : radius ? `radius-l-${radius}` : "radius-l",
           )}

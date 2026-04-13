@@ -252,6 +252,44 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   ]}
 />
 
+## Height
+
+Use the `height` prop to set the height of the input.
+
+<CodeBlock
+  marginTop="16"
+  marginBottom="24"
+  preview={
+    <Column fillWidth gap="4">
+      <Input height="xs" label="Extra small input" />
+      <Input height="s" label="Small input" />
+      <Input height="m" label="Medium input" />
+      <Input height="l" label="Large input" />
+      <Input height="xl" label="Extra large input" />
+    </Column>
+  }
+  codes={[
+    {
+      code:
+`const [value, setValue] = useState<string>("");
+
+const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+};
+
+<Input
+    id="height-input"
+    placeholder="Height"
+    value={value}
+    onChange={handleChange}
+    height="l"
+/>`,
+      language: "tsx",
+      label: "Height"
+    }
+  ]}
+/>
+
 ## NumberInput
 
 The `NumberInput` component provides a specialized input for numeric values with increment and decrement buttons. It supports min, max, and step values to control the range and increments.
