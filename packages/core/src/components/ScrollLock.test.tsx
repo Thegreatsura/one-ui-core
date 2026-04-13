@@ -104,6 +104,54 @@ describe("ScrollLock", () => {
     expect(document.body.style.overflow).toBe("");
   });
 
+  describe("layout shift prevention", () => {
+    it("does not change body.style.paddingRight when there is no scrollbar", () => {
+      vi.spyOn(window, "innerWidth", "get").mockReturnValue(1024);
+      vi.spyOn(document.documentElement, "clientWidth", "get").mockReturnValue(1024);
+
+      render(<ScrollLock enabled />);
+
+      expect(document.body.style.paddingRight).toBe("");
+    });
+
+    it("adds padding-right equal to the scrollbar width when a scrollbar is present", () => {
+      vi.spyOn(window, "innerWidth", "get").mockReturnValue(1024);
+      vi.spyOn(document.documentElement, "clientWidth", "get").mockReturnValue(1007);
+
+      render(<ScrollLock enabled />);
+
+      expect(document.body.style.paddingRight).toBe("17px");
+    });
+
+    it("restores padding-right to its original value when the lock is released", () => {
+      document.body.style.paddingRight = "8px";
+      vi.spyOn(window, "innerWidth", "get").mockReturnValue(1024);
+      vi.spyOn(document.documentElement, "clientWidth", "get").mockReturnValue(1007);
+      const { rerender } = render(<ScrollLock enabled />);
+
+      expect(document.body.style.paddingRight).toBe("25px");
+
+      rerender(<ScrollLock enabled={false} />);
+
+      expect(document.body.style.paddingRight).toBe("8px");
+    });
+
+    it("keeps padding-right applied until all lock instances release", () => {
+      vi.spyOn(window, "innerWidth", "get").mockReturnValue(1024);
+      vi.spyOn(document.documentElement, "clientWidth", "get").mockReturnValue(1007);
+      const first = render(<ScrollLock enabled />);
+      const second = render(<ScrollLock enabled />);
+
+      expect(document.body.style.paddingRight).toBe("17px");
+
+      first.rerender(<ScrollLock enabled={false} />);
+      expect(document.body.style.paddingRight).toBe("17px");
+
+      second.rerender(<ScrollLock enabled={false} />);
+      expect(document.body.style.paddingRight).toBe("");
+    });
+  });
+
   it("prevents wheel events outside the allowed element", () => {
     const { getByRole } = render(
       <ScrollLockHarness enabled includeAllowedElement scrollable />,

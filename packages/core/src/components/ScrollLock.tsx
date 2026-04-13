@@ -21,7 +21,15 @@ export const ScrollLock = ({ enabled, allowScrollInElement }: ScrollLockProps) =
     scrollPositionRef.current = { x: scrollX, y: scrollY };
 
     if (activeScrollLocks.size === 0) {
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
       scrollLockState.previousBodyOverflow = document.body.style.overflow;
+      scrollLockState.previousBodyPaddingRight = document.body.style.paddingRight;
+      if (scrollbarWidth > 0) {
+        const computedPaddingRight = Number.parseFloat(window.getComputedStyle(document.body).paddingRight) || 0;
+        document.body.style.paddingRight = `${computedPaddingRight + scrollbarWidth}px`;
+      } else {
+        document.body.style.paddingRight = "";
+      }
       document.body.style.overflow = "hidden";
     }
     activeScrollLocks.add(lockIdRef.current);
@@ -130,7 +138,9 @@ export const ScrollLock = ({ enabled, allowScrollInElement }: ScrollLockProps) =
       activeScrollLocks.delete(lockIdRef.current);
       if (activeScrollLocks.size === 0 && scrollLockState.previousBodyOverflow !== null) {
         document.body.style.overflow = scrollLockState.previousBodyOverflow;
+        document.body.style.paddingRight = scrollLockState.previousBodyPaddingRight ?? "";
         scrollLockState.previousBodyOverflow = null;
+        scrollLockState.previousBodyPaddingRight = null;
       }
 
       window.removeEventListener("wheel", preventWheel, { capture: true });
