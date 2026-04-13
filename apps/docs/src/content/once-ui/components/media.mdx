@@ -39,40 +39,6 @@ navIcon: "components"
   ]}
 />
 
-## Sizes shorthand
-
-You can pass a number to `sizes` for a common responsive pattern.
-
-`sizes={768}` expands to `(max-width: 768px) 100vw, 768px`.
-
-<CodeBlock
-  marginTop="16"
-  marginBottom="24"
-  preview={
-    <Media
-      sizes={768}
-      src="/images/docs/once-ui/vibe-coding-light.jpg"
-      alt="Preview"
-      radius="xl"
-      border="neutral-alpha-medium"
-    />
-  }
-  codes={[
-    {
-      code:
-`<Media
-    src="/image.jpg"
-    alt="Preview"
-    sizes={768}
-    radius="xl"
-    border="neutral-alpha-medium"
-/>`,
-      language: "tsx",
-      label: "Sizes shorthand"
-    }
-  ]}
-/>
-
 ## Loading
 
 Show a skeleton block while content is loading. Only works when `aspectRatio` is specified.
@@ -274,7 +240,7 @@ The component auto-detects and renders YouTube links, just pass a YouTube URL to
     ["enlarge", "boolean", "false"],
     ["priority", "boolean"],
     ["unoptimized", "boolean"],
-    ["sizes", ["string", "number"], "100vw"],
+    ["sizes", "string", "100vw"],
     ["className"],
     ["style"],
     ["...flex"]
