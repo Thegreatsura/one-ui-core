@@ -70,7 +70,8 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
     const dialogRef = useRef<HTMLDivElement>(null);
     const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
-    const wasOpenRef = useRef(isOpen);
+    const wasVisibleRef = useRef(isOpen);
+    const focusRestoredRef = useRef(false);
     const dialogId = useId();
     const dialogTitleId = `${dialogId}-title`;
     const [isVisible, setIsVisible] = useState(isOpen);
@@ -179,6 +180,7 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
 
     useEffect(() => {
       if (isOpen && dialogRef.current) {
+        focusRestoredRef.current = false;
         previouslyFocusedElementRef.current =
           document.activeElement instanceof HTMLElement ? document.activeElement : null;
         const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
@@ -189,15 +191,30 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
       }
     }, [isOpen]);
 
-    useEffect(() => {
-      if (wasOpenRef.current && !isOpen) {
-        const previousElement = previouslyFocusedElementRef.current;
-        if (previousElement && document.contains(previousElement)) {
-          previousElement.focus();
-        }
+    const restoreFocus = useCallback(() => {
+      if (focusRestoredRef.current) return;
+
+      const previousElement = previouslyFocusedElementRef.current;
+      if (previousElement && document.contains(previousElement)) {
+        previousElement.focus();
       }
-      wasOpenRef.current = isOpen;
-    }, [isOpen]);
+
+      focusRestoredRef.current = true;
+    }, []);
+
+    useEffect(() => {
+      if (wasVisibleRef.current && !isVisible) {
+        restoreFocus();
+      }
+
+      wasVisibleRef.current = isVisible;
+    }, [isVisible, restoreFocus]);
+
+    useEffect(() => {
+      return () => {
+        restoreFocus();
+      };
+    }, [restoreFocus]);
 
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {

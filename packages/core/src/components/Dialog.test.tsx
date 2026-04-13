@@ -437,7 +437,8 @@ describe("Dialog", () => {
       }
     });
 
-    it("restores focus to the opener after close", () => {
+    it("restores focus to the opener only after close animation completes", () => {
+      vi.useFakeTimers();
       const opener = document.createElement("button");
       opener.textContent = "Open dialog";
       document.body.appendChild(opener);
@@ -448,6 +449,30 @@ describe("Dialog", () => {
         expect(document.activeElement).toBe(screen.getByRole("button", { name: /close/i }));
 
         rerender(<Dialog {...defaultProps} isOpen={false} />);
+
+        expect(document.activeElement).not.toBe(opener);
+
+        advanceTimers(299);
+        expect(document.activeElement).not.toBe(opener);
+
+        advanceTimers(1);
+        expect(document.activeElement).toBe(opener);
+      } finally {
+        opener.remove();
+      }
+    });
+
+    it("restores focus on unmount while still visible", () => {
+      const opener = document.createElement("button");
+      opener.textContent = "Open dialog";
+      document.body.appendChild(opener);
+      opener.focus();
+
+      try {
+        const { unmount } = renderDialog();
+        expect(document.activeElement).toBe(screen.getByRole("button", { name: /close/i }));
+
+        unmount();
 
         expect(document.activeElement).toBe(opener);
       } finally {
