@@ -112,7 +112,7 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
         portalContainer,
         priority: base ? 8 : 9,
       });
-    }, [dialogId, getPortalContainer, isVisible, removeVisibleDialog, upsertVisibleDialog]);
+    }, [base, dialogId, getPortalContainer, isVisible, removeVisibleDialog, upsertVisibleDialog]);
 
     useEffect(() => {
       return () => {
@@ -209,12 +209,19 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
       const isTopLayer = topLayer?.id === dialogId;
       const hasOtherVisibleDialog = topLayer !== null && !isTopLayer;
 
-      if (hasOtherVisibleDialog) {
+      const previousElement = previouslyFocusedElementRef.current;
+      const isPreviousElementInDocument =
+        previousElement !== null && document.contains(previousElement);
+      const isPreviousElementInTopLayer =
+        isPreviousElementInDocument &&
+        hasOtherVisibleDialog &&
+        topLayer?.dialogElement.contains(previousElement);
+
+      if (hasOtherVisibleDialog && !isPreviousElementInTopLayer) {
         return;
       }
 
-      const previousElement = previouslyFocusedElementRef.current;
-      if (previousElement && document.contains(previousElement)) {
+      if (isPreviousElementInDocument) {
         previousElement.focus();
       }
 

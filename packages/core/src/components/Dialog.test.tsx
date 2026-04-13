@@ -479,6 +479,49 @@ describe("Dialog", () => {
         opener.remove();
       }
     });
+
+    it("restores focus to a base dialog control after closing a stacked dialog", () => {
+      vi.useFakeTimers();
+
+      const StackedDialogFocusHarness = () => {
+        const [isStackedOpen, setIsStackedOpen] = React.useState(false);
+
+        return (
+          <>
+            <Dialog
+              {...defaultProps}
+              title="Base dialog"
+              base
+              children={
+                <button type="button" onClick={() => setIsStackedOpen(true)}>
+                  Open stacked dialog
+                </button>
+              }
+            />
+            <Dialog
+              {...defaultProps}
+              title="Stacked dialog"
+              stack
+              isOpen={isStackedOpen}
+              onClose={() => setIsStackedOpen(false)}
+            />
+          </>
+        );
+      };
+
+      render(<StackedDialogFocusHarness />, { wrapper: TestProviders });
+      const openStackedButton = screen.getByRole("button", { name: "Open stacked dialog" });
+
+      openStackedButton.focus();
+      fireEvent.click(openStackedButton);
+
+      const stackedCloseButton = screen.getAllByRole("button", { name: /close/i })[1];
+
+      fireEvent.click(stackedCloseButton);
+      advanceTimers(300);
+
+      expect(document.activeElement).toBe(openStackedButton);
+    });
   });
 
   describe("inert state management", () => {
@@ -541,6 +584,34 @@ describe("Dialog", () => {
 
       expect(stackedPanel.inert).toBe(false);
       expect(basePanel.inert).toBe(true);
+    });
+
+    it("recomputes top layer when base changes while visible", () => {
+      const { rerender } = render(
+        <>
+          <Dialog {...defaultProps} title="First dialog" base={false} stack />
+          <Dialog {...defaultProps} title="Second dialog" base />
+        </>,
+        { wrapper: TestProviders },
+      );
+
+      const firstOverlay = screen.getByText("First dialog").closest('[role="dialog"]') as HTMLElement;
+      const secondOverlay = screen.getByText("Second dialog").closest('[role="dialog"]') as HTMLElement;
+      const firstPanel = getDialogPanel(firstOverlay) as HTMLElement;
+      const secondPanel = getDialogPanel(secondOverlay) as HTMLElement;
+
+      expect(firstPanel.inert).toBe(false);
+      expect(secondPanel.inert).toBe(true);
+
+      rerender(
+        <>
+          <Dialog {...defaultProps} title="First dialog" base stack={false} />
+          <Dialog {...defaultProps} title="Second dialog" base />
+        </>,
+      );
+
+      expect(firstPanel.inert).toBe(true);
+      expect(secondPanel.inert).toBe(false);
     });
 
     it("does not leave orphaned inert elements after rapid open and close", () => {
