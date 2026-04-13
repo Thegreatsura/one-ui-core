@@ -1,7 +1,19 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback, useMemo, ReactNode } from "react";
-import { Flex, Text, Icon, Column, Input, Option, Row, Kbd, ArrowNavigation, useArrowNavigationContext, ScrollLock } from "../../";
+import {
+  Flex,
+  Text,
+  Icon,
+  Column,
+  Input,
+  Option,
+  Row,
+  Kbd,
+  ArrowNavigation,
+  useArrowNavigationContext,
+  ScrollLock,
+} from "../../components";
 import { createPortal } from "react-dom";
 import { useRouter, usePathname } from "next/navigation";
 import styles from "./Kbar.module.scss";
