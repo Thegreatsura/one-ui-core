@@ -2,11 +2,8 @@
 
 import { useLayoutEffect, useRef, RefObject } from "react";
 import {
-  activeScrollLockAllowElements,
-  activeScrollLocks,
-  attachScrollLockGlobalListeners,
-  detachScrollLockGlobalListeners,
-  scrollLockState,
+  acquireScrollLock,
+  releaseScrollLock,
 } from "../internal/scrollLockState";
 
 interface ScrollLockProps {
@@ -26,23 +23,7 @@ export const ScrollLock = ({ enabled, allowScrollInElement }: ScrollLockProps) =
     const scrollY = window.scrollY;
     scrollPositionRef.current = { x: scrollX, y: scrollY };
 
-    if (activeScrollLocks.size === 0) {
-      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-      scrollLockState.previousBodyOverflow = document.body.style.overflow;
-      scrollLockState.previousBodyPaddingRight = document.body.style.paddingRight;
-      if (scrollbarWidth > 0) {
-        const computedPaddingRight = Number.parseFloat(window.getComputedStyle(document.body).paddingRight) || 0;
-        document.body.style.paddingRight = `${computedPaddingRight + scrollbarWidth}px`;
-      } else {
-        document.body.style.paddingRight = "";
-      }
-      document.body.style.overflow = "hidden";
-    }
-    activeScrollLocks.add(lockIdRef.current);
-    activeScrollLockAllowElements.set(lockIdRef.current, allowScrollInElement);
-    if (activeScrollLocks.size === 1) {
-      attachScrollLockGlobalListeners();
-    }
+    acquireScrollLock(lockIdRef.current, allowScrollInElement);
 
     // Restore scroll position after a microtask to catch any scroll that happens during mount
     queueMicrotask(() => {
@@ -50,15 +31,7 @@ export const ScrollLock = ({ enabled, allowScrollInElement }: ScrollLockProps) =
     });
 
     return () => {
-      activeScrollLocks.delete(lockIdRef.current);
-      activeScrollLockAllowElements.delete(lockIdRef.current);
-      if (activeScrollLocks.size === 0 && scrollLockState.previousBodyOverflow !== null) {
-        document.body.style.overflow = scrollLockState.previousBodyOverflow;
-        document.body.style.paddingRight = scrollLockState.previousBodyPaddingRight ?? "";
-        scrollLockState.previousBodyOverflow = null;
-        scrollLockState.previousBodyPaddingRight = null;
-        detachScrollLockGlobalListeners();
-      }
+      releaseScrollLock(lockIdRef.current);
     };
   }, [enabled, allowScrollInElement]);
 

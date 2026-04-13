@@ -76,6 +76,9 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
     const dialogTitleId = `${dialogId}-title`;
     const [isVisible, setIsVisible] = useState(isOpen);
     const [isAnimating, setIsAnimating] = useState(false);
+    const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(() =>
+      typeof document === "undefined" ? null : document.body,
+    );
     const { upsertVisibleDialog, removeVisibleDialog } = useContext(DialogContext);
 
     const getPortalContainer = useCallback((): HTMLElement | null => {
@@ -114,6 +117,12 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
         removeVisibleDialog(dialogId);
       };
     }, [dialogId, removeVisibleDialog]);
+
+    useEffect(() => {
+      if (!portalContainer) {
+        setPortalContainer(document.body);
+      }
+    }, [portalContainer]);
 
     useEffect(() => {
       if (animationTimerRef.current) {
@@ -247,7 +256,7 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
       }
     }, [isVisible, onClose, stack, base]);
 
-    if (!isVisible) return null;
+    if (!isVisible || !portalContainer) return null;
 
     return ReactDOM.createPortal(
       <>
@@ -366,7 +375,7 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
         </Flex>
       </Flex>
       </>,
-      document.body,
+      portalContainer,
     );
   },
 );

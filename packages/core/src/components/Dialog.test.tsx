@@ -712,5 +712,20 @@ describe("Dialog", () => {
         );
       }).not.toThrow();
     });
+
+    it("does not throw during server render when open", () => {
+      vi.stubGlobal("document", undefined);
+      try {
+        expect(() => {
+          renderToString(
+            <LayoutProvider>
+              <Dialog {...defaultProps} isOpen />
+            </LayoutProvider>,
+          );
+        }).not.toThrow();
+      } finally {
+        vi.unstubAllGlobals();
+      }
+    });
   });
 });

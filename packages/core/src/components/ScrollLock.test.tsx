@@ -132,6 +132,7 @@ describe("ScrollLock", () => {
     const removeSpy = vi.spyOn(window, "removeEventListener");
     const first = render(<ScrollLock enabled />);
     const second = render(<ScrollLock enabled />);
+    const third = render(<ScrollLock enabled />);
 
     const countCalls = (spy: ReturnType<typeof vi.spyOn>, eventName: string) =>
       spy.mock.calls.filter(([name]) => name === eventName).length;
@@ -141,11 +142,23 @@ describe("ScrollLock", () => {
     expect(countCalls(addSpy, "touchmove")).toBe(1);
     expect(countCalls(addSpy, "keydown")).toBe(1);
     expect(countCalls(removeSpy, "wheel")).toBe(0);
+    expect(countCalls(removeSpy, "touchstart")).toBe(0);
+    expect(countCalls(removeSpy, "touchmove")).toBe(0);
+    expect(countCalls(removeSpy, "keydown")).toBe(0);
 
     first.rerender(<ScrollLock enabled={false} />);
     expect(countCalls(removeSpy, "wheel")).toBe(0);
+    expect(countCalls(removeSpy, "touchstart")).toBe(0);
+    expect(countCalls(removeSpy, "touchmove")).toBe(0);
+    expect(countCalls(removeSpy, "keydown")).toBe(0);
 
     second.rerender(<ScrollLock enabled={false} />);
+    expect(countCalls(removeSpy, "wheel")).toBe(0);
+    expect(countCalls(removeSpy, "touchstart")).toBe(0);
+    expect(countCalls(removeSpy, "touchmove")).toBe(0);
+    expect(countCalls(removeSpy, "keydown")).toBe(0);
+
+    third.rerender(<ScrollLock enabled={false} />);
     expect(countCalls(removeSpy, "wheel")).toBe(1);
     expect(countCalls(removeSpy, "touchstart")).toBe(1);
     expect(countCalls(removeSpy, "touchmove")).toBe(1);

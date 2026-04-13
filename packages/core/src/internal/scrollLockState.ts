@@ -77,13 +77,25 @@ const isTargetInAnyAllowedElement = (target: HTMLElement): boolean => {
   return false;
 };
 
+const canAllowScroll = (
+  target: HTMLElement,
+  source: "wheel" | "touchmove" | "keydown",
+  deltaY?: number,
+): boolean => {
+  if (source === "keydown") {
+    return isTargetInAnyAllowedElement(target);
+  }
+
+  return canAnyAllowedElementScroll(target, deltaY ?? 0);
+};
+
 const preventWheel = (e: WheelEvent) => {
   if (!(e.target instanceof HTMLElement)) {
     e.preventDefault();
     return;
   }
 
-  if (canAnyAllowedElementScroll(e.target, e.deltaY)) {
+  if (canAllowScroll(e.target, "wheel", e.deltaY)) {
     return;
   }
 
@@ -110,7 +122,7 @@ const preventTouch = (e: TouchEvent) => {
   }
 
   const deltaY = scrollLockState.touchStartY - e.touches[0].clientY;
-  if (canAnyAllowedElementScroll(e.target, deltaY)) {
+  if (canAllowScroll(e.target, "touchmove", deltaY)) {
     return;
   }
 
@@ -127,7 +139,7 @@ const preventKeyScroll = (e: KeyboardEvent) => {
     return;
   }
 
-  if (isTargetInAnyAllowedElement(e.target)) {
+  if (canAllowScroll(e.target, "keydown")) {
     return;
   }
 
@@ -156,6 +168,50 @@ export const detachScrollLockGlobalListeners = () => {
   window.removeEventListener("touchmove", preventTouch, { capture: true });
   window.removeEventListener("keydown", preventKeyScroll, { capture: true });
   scrollLockState.globalListenersAttached = false;
+};
+
+export const acquireScrollLock = (
+  lockId: symbol,
+  allowScrollInElement?: RefObject<HTMLElement | null>,
+) => {
+  if (activeScrollLocks.has(lockId)) {
+    activeScrollLockAllowElements.set(lockId, allowScrollInElement);
+    return;
+  }
+
+  if (activeScrollLocks.size === 0) {
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    scrollLockState.previousBodyOverflow = document.body.style.overflow;
+    scrollLockState.previousBodyPaddingRight = document.body.style.paddingRight;
+    if (scrollbarWidth > 0) {
+      const computedPaddingRight = Number.parseFloat(window.getComputedStyle(document.body).paddingRight) || 0;
+      document.body.style.paddingRight = `${computedPaddingRight + scrollbarWidth}px`;
+    } else {
+      document.body.style.paddingRight = "";
+    }
+    document.body.style.overflow = "hidden";
+    attachScrollLockGlobalListeners();
+  }
+
+  activeScrollLocks.add(lockId);
+  activeScrollLockAllowElements.set(lockId, allowScrollInElement);
+};
+
+export const releaseScrollLock = (lockId: symbol) => {
+  if (!activeScrollLocks.has(lockId)) {
+    return;
+  }
+
+  activeScrollLocks.delete(lockId);
+  activeScrollLockAllowElements.delete(lockId);
+
+  if (activeScrollLocks.size === 0 && scrollLockState.previousBodyOverflow !== null) {
+    document.body.style.overflow = scrollLockState.previousBodyOverflow;
+    document.body.style.paddingRight = scrollLockState.previousBodyPaddingRight ?? "";
+    scrollLockState.previousBodyOverflow = null;
+    scrollLockState.previousBodyPaddingRight = null;
+    detachScrollLockGlobalListeners();
+  }
 };
 
 export const resetScrollLockTestState = () => {
