@@ -186,8 +186,6 @@ export const acquireScrollLock = (
     if (scrollbarWidth > 0) {
       const computedPaddingRight = Number.parseFloat(window.getComputedStyle(document.body).paddingRight) || 0;
       document.body.style.paddingRight = `${computedPaddingRight + scrollbarWidth}px`;
-    } else {
-      document.body.style.paddingRight = "";
     }
     document.body.style.overflow = "hidden";
     attachScrollLockGlobalListeners();

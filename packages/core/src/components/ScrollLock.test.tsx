@@ -189,13 +189,17 @@ describe("ScrollLock", () => {
   });
 
   describe("layout shift prevention", () => {
-    it("does not change body.style.paddingRight when there is no scrollbar", () => {
+    it("keeps pre-existing body.style.paddingRight unchanged when there is no scrollbar", () => {
+      document.body.style.paddingRight = "12px";
       vi.spyOn(window, "innerWidth", "get").mockReturnValue(1024);
       vi.spyOn(document.documentElement, "clientWidth", "get").mockReturnValue(1024);
+      const { rerender } = render(<ScrollLock enabled />);
 
-      render(<ScrollLock enabled />);
+      expect(document.body.style.paddingRight).toBe("12px");
 
-      expect(document.body.style.paddingRight).toBe("");
+      rerender(<ScrollLock enabled={false} />);
+
+      expect(document.body.style.paddingRight).toBe("12px");
     });
 
     it("adds padding-right equal to the scrollbar width when a scrollbar is present", () => {
