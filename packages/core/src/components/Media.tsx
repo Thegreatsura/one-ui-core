@@ -19,6 +19,10 @@ export interface MediaProps extends React.ComponentProps<typeof Flex> {
   caption?: ReactNode;
   fill?: boolean;
   fillWidth?: boolean;
+  loop?: boolean;
+  autoplay?: boolean;
+  sound?: boolean;
+  controls?: boolean;
   style?: CSSProperties;
   className?: string;
 }
@@ -37,6 +41,10 @@ const Media: React.FC<MediaProps> = ({
   height,
   priority,
   caption,
+  loop = true,
+  autoplay = true,
+  sound = false,
+  controls = false,
   style,
   className,
   ...rest
@@ -125,7 +133,7 @@ const Media: React.FC<MediaProps> = ({
       /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
     );
     return match
-      ? `https://www.youtube.com/embed/${match[1]}?controls=0&rel=0&modestbranding=1`
+      ? `https://www.youtube.com/embed/${match[1]}?controls=${controls ? 1 : 0}&rel=0&modestbranding=1`
       : "";
   };
 
@@ -180,9 +188,9 @@ const Media: React.FC<MediaProps> = ({
           {!loading && isVideo && (
             <video
               src={src}
-              autoPlay
-              loop
-              muted
+              autoPlay={autoplay}
+              loop={loop}
+              muted={!sound}
               playsInline
               style={{
                 width: "100%",
