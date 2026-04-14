@@ -74,8 +74,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 
     const adjustHeight = () => {
       if (textareaRef.current) {
+        const scrollY = window.scrollY;
         textareaRef.current.style.height = "auto";
-        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Set to scroll height
+        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+        window.scrollTo({ top: scrollY });
       }
     };
 
