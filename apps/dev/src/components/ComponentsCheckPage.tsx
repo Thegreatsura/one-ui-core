@@ -118,6 +118,7 @@ export default function ComponentsCheck() {
                 { name: "Column", element: <Column padding="m" background="neutral-medium" radius="l"><Text>Column Layout</Text></Column> },
                 { name: "Row", element: <Row padding="m" background="neutral-medium" radius="l"><Text>Row Layout</Text></Row> },
                 { name: "Flex", element: <Flex padding="m" background="neutral-medium" radius="l"><Text>Flex Layout</Text></Flex> },
+                { name: "Flex maxWidth", element: <Flex maxWidth="xl" padding="m" background="brand-medium" radius="l"><Text onBackground="brand-strong">maxWidth="xl"</Text></Flex> },
                 { name: "Grid", element: <Grid columns="2" gap="m" fillWidth><Column padding="m" background="neutral-medium" radius="l"><Text>Grid 1</Text></Column><Column padding="m" background="neutral-medium" radius="l"><Text>Grid 2</Text></Column></Grid> },
             ],
         },
