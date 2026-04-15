@@ -4,8 +4,8 @@ import '@once-ui-system/core/css/tokens.css';
 import classNames from "classnames";
 
 import { Background, Column, Flex } from "@once-ui-system/core";
-import { dataStyle, effects, style } from "../resources/once-ui.config";
-import { Providers } from "../components/Providers";
+import { dataStyle, effects, style } from "@/resources/once-ui.config";
+import { Providers } from "@/components/Providers";
 
 import { Geist } from "next/font/google";
 import { Geist_Mono } from "next/font/google";

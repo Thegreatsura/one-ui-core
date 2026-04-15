@@ -159,7 +159,7 @@ export default function ComponentsCheck() {
             components: [
                 { name: "Table", element: <Table data={{ headers: [{ content: "Name", key: "name" }], rows: [["John"]] }} /> },
                 { name: "List", element: <List><ListItem>Item 1</ListItem><ListItem>Item 2</ListItem></List> },
-                { name: "Timeline", element: <Timeline items={[{ label: "Event 1" }, { label: "Event 2" }]} /> },
+                { name: "Timeline", element: <Timeline items={[{ label: "Event 1" }, { label: "Event 2" }, { label: "Event 2, { label: \"Event 2\" }, { label: \"Event 2\" }, { label: \"Event 2\" }, { label: \"Event 2\" }, { label: \"Event 2\" }" }, { label: "Event 2" }, { label: "Event 2" }]} /> },
                 { name: "Badge", element: <Badge>Badge</Badge> },
                 { name: "Tag", element: <Tag label="tag label">Tag</Tag> },
                 { name: "Chip", element: <Chip label="chip label">Chip</Chip> },
