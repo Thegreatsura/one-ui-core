@@ -252,6 +252,36 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   ]}
 />
 
+## Sizes
+
+The Input component supports five sizes: extra small, small, medium, large, and extra large.
+
+<CodeBlock
+  marginTop="16"
+  marginBottom="24"
+  preview={
+    <Column fillWidth gap="16">
+      <Input id="size-xs" placeholder="Extra Small" componentHeight="xs" />
+      <Input id="size-s" placeholder="Small" componentHeight="s" />
+      <Input id="size-m" placeholder="Medium" componentHeight="m" />
+      <Input id="size-l" placeholder="Large" componentHeight="l" />
+      <Input id="size-xl" placeholder="Extra Large" componentHeight="xl" />
+    </Column>
+  }
+  codes={[
+    {
+      code:
+`<Input placeholder="Extra Small" componentHeight="xs" />
+<Input placeholder="Small" componentHeight="s" />
+<Input placeholder="Medium" componentHeight="m" />
+<Input placeholder="Large" componentHeight="l" />
+<Input placeholder="Extra Large" componentHeight="xl" />`,
+      language: "tsx",
+      label: "Sizes"
+    }
+  ]}
+ />
+
 ## NumberInput
 
 The `NumberInput` component provides a specialized input for numeric values with increment and decrement buttons. It supports min, max, and step values to control the range and increments.
@@ -425,7 +455,7 @@ You can use the `radius` prop to apply custom radius to sides or corners. It wor
     ["id", "string"],
     ["label", "string"],
     ["placeholder", "string"],
-    ["height", ["s", "m"], "m"],
+    ["componentHeight", ["xs", "s", "m", "l", "xl"], "m"],
     ["error", "boolean", "false"],
     ["errorMessage", "ReactNode"],
     ["description", "ReactNode"],

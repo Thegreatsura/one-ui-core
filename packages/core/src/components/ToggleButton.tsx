@@ -10,7 +10,7 @@ interface CommonProps {
   label?: ReactNode;
   selected?: boolean;
   variant?: "ghost" | "outline";
-  size?: "s" | "m" | "l" | "xl";
+  size?: "xs" | "s" | "m" | "l" | "xl";
   radius?:
     | "none"
     | "top"
@@ -87,21 +87,21 @@ const ToggleButton = forwardRef<HTMLElement, ToggleButtonProps>(
         style={style}
         {...props}
       >
-        {prefixIcon && <Icon name={prefixIcon} size={size === "l" ? "s" : "xs"} />}
+        {prefixIcon && <Icon name={prefixIcon} size={size === "xl" ? "m" : size === "l" ? "s" : "xs"} />}
         {(label || children) && (
           <Flex
             fillWidth={fillWidth}
             horizontal={horizontal}
             textWeight={weight}
-            paddingX={size === "s" ? "2" : "4"}
-            textSize={size === "l" ? "m" : "s"}
+            paddingX={size === "xl" ? "12" : size === "l" ? "8" : size === "s" ? "4" : "2"}
+            textSize={size === "xl" ? "l" : size === "l" ? "m" : "s"}
             className="font-label"
             position="static"
           >
             {label || children}
           </Flex>
         )}
-        {suffixIcon && <Icon name={suffixIcon} size={size === "l" ? "s" : "xs"} />}
+        {suffixIcon && <Icon name={suffixIcon} size={size === "xl" ? "m" : size === "l" ? "s" : "xs"} />}
       </ElementType>
     );
   },

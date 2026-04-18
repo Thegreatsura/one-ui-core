@@ -46,7 +46,7 @@
     transform: translateY(-50%);
 
     &.floating {
-        transform: scale(0.75);
+        transform: translateY(-50%) scale(0.75);
     }
 }
 
@@ -97,7 +97,7 @@
 }
 
 .xl {
-    min-height: var(--static-space-72);
+    min-height: var(--static-space-80);
 
     .label {
         &.floating {

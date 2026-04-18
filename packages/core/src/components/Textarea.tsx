@@ -134,12 +134,20 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 
     const displayError = validationError || errorMessage;
 
+    const fontSizeMap = {
+      xs: "font-s",
+      s: "font-s",
+      m: "font-m",
+      l: "font-l",
+      xl: "font-xl",
+    };
+
     const textareaClassNames = classNames(
       styles.input,
       styles.textarea,
       "font-body",
       "font-default",
-      "font-m",
+      fontSizeMap[componentHeight],
       {
         [styles.filled]: isFilled,
         [styles.focused]: isFocused,
