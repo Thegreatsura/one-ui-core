@@ -36,6 +36,12 @@
     }
 }
 
+.xs {
+    height: var(--static-space-20);
+    min-height: var(--static-space-20);
+    padding: var(--static-space-2) var(--static-space-8);
+}
+
 .s {
     height: var(--static-space-24);
     min-height: var(--static-space-24);
@@ -52,6 +58,12 @@
     height: var(--static-space-40);
     min-height: var(--static-space-40);
     padding: var(--static-space-8) var(--static-space-16);
+}
+
+.xl {
+    height: var(--static-space-48);
+    min-height: var(--static-space-48);
+    padding: var(--static-space-12) var(--static-space-20);
 }
 
 .ghost {
