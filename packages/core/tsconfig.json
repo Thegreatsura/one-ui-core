@@ -4,8 +4,6 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
     "moduleResolution": "node",
-    "typeRoots": ["./types", "./node_modules/@types"],
-    "types": ["node"],
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowJs": true,
@@ -15,10 +13,11 @@
     "jsx": "react-jsx",
     "declaration": true,
     "outDir": "./dist",
+    "typeRoots": ["./types", "./node_modules/@types"],
     "paths": {
       "@/*": ["./src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "scss.d.ts"],
-  "exclude": ["node_modules", "dist", "src/test/**", "**/*.test.*", "**/*.spec.*"]
+  "exclude": ["node_modules", "dist"]
 }
