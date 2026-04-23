@@ -147,7 +147,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       styles.textarea,
       "font-body",
       "font-default",
-      fontSizeMap[componentHeight],
+      fontSizeMap[height],
       {
         [styles.filled]: isFilled,
         [styles.focused]: isFocused,

@@ -126,6 +126,13 @@
     }
 }
 
+.xs {
+    padding: var(--static-space-2) var(--static-space-4);
+    min-height: var(--static-space-24);
+    height: var(--static-space-24);
+    gap: var(--static-space-2);
+}
+
 .s {
     padding: var(--static-space-4) var(--static-space-8);
     min-height: var(--static-space-32);
@@ -145,4 +152,11 @@
     min-height: var(--static-space-48);
     height: var(--static-space-48);
     gap: var(--static-space-8);
+}
+
+.xl {
+    padding: var(--static-space-16) var(--static-space-24);
+    min-height: var(--static-space-56);
+    height: var(--static-space-56);
+    gap: var(--static-space-12);
 }

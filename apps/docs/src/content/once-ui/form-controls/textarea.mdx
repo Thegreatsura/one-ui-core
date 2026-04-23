@@ -305,21 +305,21 @@ The Textarea component supports five sizes: extra small, small, medium, large, a
   marginBottom="24"
   preview={
     <Column fillWidth gap="16">
-      <Textarea id="size-xs" placeholder="Extra Small" componentHeight="xs" />
-      <Textarea id="size-s" placeholder="Small" componentHeight="s" />
-      <Textarea id="size-m" placeholder="Medium" componentHeight="m" />
-      <Textarea id="size-l" placeholder="Large" componentHeight="l" />
-      <Textarea id="size-xl" placeholder="Extra Large" componentHeight="xl" />
+      <Textarea id="size-xs" placeholder="Extra Small" height="xs" />
+      <Textarea id="size-s" placeholder="Small" height="s" />
+      <Textarea id="size-m" placeholder="Medium" height="m" />
+      <Textarea id="size-l" placeholder="Large" height="l" />
+      <Textarea id="size-xl" placeholder="Extra Large" height="xl" />
     </Column>
   }
   codes={[
     {
       code:
-`<Textarea placeholder="Extra Small" componentHeight="xs" />
-<Textarea placeholder="Small" componentHeight="s" />
-<Textarea placeholder="Medium" componentHeight="m" />
-<Textarea placeholder="Large" componentHeight="l" />
-<Textarea placeholder="Extra Large" componentHeight="xl" />`,
+`<Textarea placeholder="Extra Small" height="xs" />
+<Textarea placeholder="Small" height="s" />
+<Textarea placeholder="Medium" height="m" />
+<Textarea placeholder="Large" height="l" />
+<Textarea placeholder="Extra Large" height="xl" />`,
       language: "tsx",
       label: "Sizes"
     }
@@ -397,7 +397,7 @@ const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     ["id", "string"],
     ["label", "string"],
     ["placeholder", "string"],
-    ["componentHeight", ["xs", "s", "m", "l", "xl"], "m"],
+    ["height", ["xs", "s", "m", "l", "xl"], "m"],
     ["lines", ["number", "auto"], "3"],
     ["error", "boolean", "false"],
     ["errorMessage", "ReactNode"],
