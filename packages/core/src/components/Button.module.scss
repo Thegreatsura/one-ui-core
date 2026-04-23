@@ -9,8 +9,14 @@
     -webkit-tap-highlight-color: transparent;
     transition: var(--transition-micro-medium);
 
-    &:hover, &:focus {
+    &:focus-visible {
         z-index: 1;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        &:hover {
+            z-index: 1;
+        }
     }
 
     &:disabled {
@@ -29,13 +35,15 @@
     border-color: var(--solid-border-color-brand);
     color: var(--brand-on-solid-strong);
 
-    &:hover {
-        background: var(--brand-solid-strong);
+    @media (hover: hover) and (pointer: fine) {
+        &:hover {
+            background: var(--brand-solid-strong);
 
-        &:disabled {
-            background: var(--neutral-background-medium);
-            color: var(--neutral-on-background-weak);
-            border: none;
+            &:disabled {
+                background: var(--neutral-background-medium);
+                color: var(--neutral-on-background-weak);
+                border: none;
+            }
         }
     }
 }
@@ -47,14 +55,16 @@
     background: var(--static-transparent);
     color: var(--neutral-on-background-strong);
 
-    &:hover {
-        background: var(--neutral-alpha-weak);
-        border-color: var(--neutral-alpha-weak);
+    @media (hover: hover) and (pointer: fine) {
+        &:hover {
+            background: var(--neutral-alpha-weak);
+            border-color: var(--neutral-alpha-weak);
 
-        &:disabled {
-            background: var(--neutral-background-medium);
-            color: var(--neutral-on-background-weak);
-            border: 1px solid var(--neutral-alpha-weak);
+            &:disabled {
+                background: var(--neutral-background-medium);
+                color: var(--neutral-on-background-weak);
+                border: 1px solid var(--neutral-alpha-weak);
+            }
         }
     }
 }
@@ -64,13 +74,15 @@
     color: var(--neutral-on-background-strong);
     border: 1px solid var(--static-transparent);
 
-    &:hover {
-        border: 1px solid var(--neutral-border-medium);
+    @media (hover: hover) and (pointer: fine) {
+        &:hover {
+            border: 1px solid var(--neutral-border-medium);
 
-        &:disabled {
-            background: var(--neutral-background-medium);
-            color: var(--neutral-on-background-weak);
-            border: 1px solid var(--static-transparent);
+            &:disabled {
+                background: var(--neutral-background-medium);
+                color: var(--neutral-on-background-weak);
+                border: 1px solid var(--static-transparent);
+            }
         }
     }
 }
@@ -80,13 +92,15 @@
     background: var(--static-transparent);
     color: var(--neutral-on-background-medium);
 
-    &:hover {
-        color: var(--neutral-on-background-strong);
+    @media (hover: hover) and (pointer: fine) {
+        &:hover {
+            color: var(--neutral-on-background-strong);
 
-        &:disabled {
-            background: var(--neutral-background-medium);
-            color: var(--neutral-on-background-weak);
-            border: 1px solid var(--neutral-alpha-weak);
+            &:disabled {
+                background: var(--neutral-background-medium);
+                color: var(--neutral-on-background-weak);
+                border: 1px solid var(--neutral-alpha-weak);
+            }
         }
     }
 }
@@ -99,13 +113,15 @@
     border-color: var(--solid-border-color-danger);
     color: var(--danger-on-solid-strong);
 
-    &:hover {
-        background: var(--danger-solid-strong);
+    @media (hover: hover) and (pointer: fine) {
+        &:hover {
+            background: var(--danger-solid-strong);
 
-        &:disabled {
-            background: var(--neutral-background-medium);
-            color: var(--neutral-on-background-weak);
-            border: none;
+            &:disabled {
+                background: var(--neutral-background-medium);
+                color: var(--neutral-on-background-weak);
+                border: none;
+            }
         }
     }
 }
