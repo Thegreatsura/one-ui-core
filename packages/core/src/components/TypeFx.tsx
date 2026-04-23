@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Text } from ".";
 
 export interface TypeFxProps extends Omit<React.ComponentProps<typeof Text>, 'children'> {
@@ -25,116 +25,91 @@ const TypeFx: React.FC<TypeFxProps> = ({
   children,
   ...text
 }) => {
-    const [displayText, setDisplayText] = useState<string>("");
-    const [isComplete, setIsComplete] = useState<boolean>(false);
-    const isRunningRef = useRef<boolean>(false);
-    const timeoutRef = useRef<number | null>(null);
-    const hasTriggeredRef = useRef<boolean>(false);
-    const prevWordsRef = useRef<string | string[]>(words);
-    
-    // Store config in refs to avoid re-creating typeText on every prop change
-    const configRef = useRef({ speed, delay, hold, loop });
-    configRef.current = { speed, delay, hold, loop };
-    
-    const wordsRef = useRef<string[]>(Array.isArray(words) ? words : [words]);
-    wordsRef.current = Array.isArray(words) ? words : [words];
+  const [displayText, setDisplayText] = useState("");
+  const [isComplete, setIsComplete] = useState(false);
+  const [triggered, setTriggered] = useState(trigger === "instant");
+  const timeoutRef = useRef<number | null>(null);
 
-    const typeText = useCallback(async () => {
-      if (isRunningRef.current) return;
-      
-      hasTriggeredRef.current = true;
-      isRunningRef.current = true;
-      
-      const wordsArray = wordsRef.current;
+  const wordsHash = JSON.stringify(Array.isArray(words) ? words : [words]);
+
+  useEffect(() => {
+    if (trigger === "instant") setTriggered(true);
+  }, [trigger]);
+
+  useEffect(() => {
+    if (trigger === "custom" && onTrigger) {
+      onTrigger(() => setTriggered(true));
+    }
+  }, [trigger, onTrigger]);
+
+  useEffect(() => {
+    if (!triggered) return;
+
+    let active = true;
+    let pendingResolve: (() => void) | null = null;
+
+    setDisplayText("");
+    setIsComplete(false);
+
+    const sleep = (ms: number) =>
+      new Promise<void>((resolve) => {
+        pendingResolve = resolve;
+        timeoutRef.current = window.setTimeout(resolve, ms);
+      });
+
+    const run = async () => {
+      const wordsArray: string[] = JSON.parse(wordsHash);
       const isSingleWord = wordsArray.length === 1;
-      const { speed, delay, hold, loop } = configRef.current;
 
-      // Initial delay
       if (delay > 0) {
-        await new Promise((resolve) => {
-          timeoutRef.current = window.setTimeout(resolve, delay);
-        });
+        await sleep(delay);
+        if (!active) return;
       }
 
       let currentIndex = 0;
 
-      while (true) {
+      while (active) {
         const currentWord = wordsArray[currentIndex];
 
-        // Type out the word
         for (let i = 0; i <= currentWord.length; i++) {
-          if (!isRunningRef.current) return;
+          if (!active) return;
           setDisplayText(currentWord.substring(0, i));
-          await new Promise((resolve) => {
-            timeoutRef.current = window.setTimeout(resolve, speed);
-          });
+          await sleep(speed);
         }
 
-        // If single word, stop here
         if (isSingleWord) {
-          setIsComplete(true);
-          isRunningRef.current = false;
+          if (active) setIsComplete(true);
           return;
         }
 
-        // Hold the complete text
-        await new Promise((resolve) => {
-          timeoutRef.current = window.setTimeout(resolve, hold);
-        });
+        if (!active) return;
+        await sleep(hold);
 
-        // Delete the word
         for (let i = currentWord.length; i >= 0; i--) {
-          if (!isRunningRef.current) return;
+          if (!active) return;
           setDisplayText(currentWord.substring(0, i));
-          await new Promise((resolve) => {
-            timeoutRef.current = window.setTimeout(resolve, speed / 2); // Delete faster
-          });
+          await sleep(speed / 2);
         }
 
-        // Move to next word
         currentIndex = (currentIndex + 1) % wordsArray.length;
 
-        // If not looping and we're back at the start, stop
-        if (!loop && currentIndex === 0) {
-          isRunningRef.current = false;
-          return;
-        }
+        if (!loop && currentIndex === 0) return;
 
-        // Small pause before typing next word
-        await new Promise((resolve) => {
-          timeoutRef.current = window.setTimeout(resolve, speed);
-        });
+        if (!active) return;
+        await sleep(speed);
       }
-    }, []); // Empty deps since all values are in refs
+    };
 
-    useEffect(() => {
-      if (trigger === "instant" && !hasTriggeredRef.current) {
-        hasTriggeredRef.current = true;
-        typeText();
-      } else if (trigger === "custom" && onTrigger && !hasTriggeredRef.current) {
-        hasTriggeredRef.current = true;
-        onTrigger(typeText);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Only run on mount - typeText is stable via useCallback
+    run();
 
-    // Reset when words actually change
-    useEffect(() => {
-      // Check if words actually changed
-      const wordsChanged = prevWordsRef.current !== words;
-      
-      if (!wordsChanged) return;
-      
-      prevWordsRef.current = words;
-      
-      isRunningRef.current = false;
-      hasTriggeredRef.current = false;
+    return () => {
+      active = false;
       if (timeoutRef.current !== null) {
         clearTimeout(timeoutRef.current);
       }
-      setDisplayText("");
-      setIsComplete(false);
-    }, [words]);
+      if (pendingResolve) pendingResolve();
+    };
+  }, [triggered, wordsHash, speed, delay, hold, loop]);
 
   return (
     <Text {...text}>
