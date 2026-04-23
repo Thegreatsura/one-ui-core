@@ -111,3 +111,4 @@ export * from "./User";
 export * from "./UserMenu";
 export * from "./Pulse";
 export * from "./CelebrationFx";
+export * from "./FadingLettersFx";

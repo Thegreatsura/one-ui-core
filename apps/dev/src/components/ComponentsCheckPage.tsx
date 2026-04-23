@@ -97,6 +97,7 @@ import {
     WeatherFx,
     CountdownFx,
     Input,
+    FadingLettersFx,
 } from "@once-ui-system/core";
 
 interface ComponentCategory {
@@ -236,6 +237,7 @@ export default function ComponentsCheck() {
                 { name: "ShineFx", element: <ShineFx><Text>Shine Effect</Text></ShineFx> },
                 { name: "TiltFx", element: <TiltFx><Text>Tilt Effect</Text></TiltFx> },
                 { name: "WeatherFx", element: <WeatherFx><Text>Weather Effect</Text></WeatherFx> },
+                { name: "FadingLettersFx", element: <FadingLettersFx text="Fading Letters Effect" animationState="entering" variant="heading-strong-m" /> },
             ],
         },
         {
