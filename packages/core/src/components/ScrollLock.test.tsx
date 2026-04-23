@@ -71,6 +71,29 @@ const ScrollLockHarness = ({
   );
 };
 
+const DualScrollLockHarness = () => {
+  const baseAllowedRef = useRef<HTMLDivElement>(null);
+  const topAllowedRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <>
+      <div ref={baseAllowedRef} data-testid="base-allowed-root">
+        <div data-testid="base-scrollable" style={{ overflowY: "auto" }}>
+          <button type="button">Base allowed child</button>
+        </div>
+      </div>
+      <div ref={topAllowedRef} data-testid="top-allowed-root">
+        <div data-testid="top-scrollable" style={{ overflowY: "auto" }}>
+          <button type="button">Top allowed child</button>
+        </div>
+      </div>
+      <button type="button">Outside child</button>
+      <ScrollLock enabled allowScrollInElement={baseAllowedRef} />
+      <ScrollLock enabled allowScrollInElement={topAllowedRef} />
+    </>
+  );
+};
+
 beforeEach(() => {
   resetScrollLockTestState();
   document.body.innerHTML = "";
@@ -102,6 +125,119 @@ describe("ScrollLock", () => {
 
     second.rerender(<ScrollLock enabled={false} />);
     expect(document.body.style.overflow).toBe("");
+  });
+
+  it("attaches global listeners once for multiple locks and removes them after the last release", () => {
+    const addSpy = vi.spyOn(window, "addEventListener");
+    const removeSpy = vi.spyOn(window, "removeEventListener");
+    const first = render(<ScrollLock enabled />);
+    const second = render(<ScrollLock enabled />);
+    const third = render(<ScrollLock enabled />);
+
+    const countCalls = (spy: ReturnType<typeof vi.spyOn>, eventName: string) =>
+      spy.mock.calls.filter(([name]) => name === eventName).length;
+
+    expect(countCalls(addSpy, "wheel")).toBe(1);
+    expect(countCalls(addSpy, "touchstart")).toBe(1);
+    expect(countCalls(addSpy, "touchmove")).toBe(1);
+    expect(countCalls(addSpy, "keydown")).toBe(1);
+    expect(countCalls(removeSpy, "wheel")).toBe(0);
+    expect(countCalls(removeSpy, "touchstart")).toBe(0);
+    expect(countCalls(removeSpy, "touchmove")).toBe(0);
+    expect(countCalls(removeSpy, "keydown")).toBe(0);
+
+    first.rerender(<ScrollLock enabled={false} />);
+    expect(countCalls(removeSpy, "wheel")).toBe(0);
+    expect(countCalls(removeSpy, "touchstart")).toBe(0);
+    expect(countCalls(removeSpy, "touchmove")).toBe(0);
+    expect(countCalls(removeSpy, "keydown")).toBe(0);
+
+    second.rerender(<ScrollLock enabled={false} />);
+    expect(countCalls(removeSpy, "wheel")).toBe(0);
+    expect(countCalls(removeSpy, "touchstart")).toBe(0);
+    expect(countCalls(removeSpy, "touchmove")).toBe(0);
+    expect(countCalls(removeSpy, "keydown")).toBe(0);
+
+    third.rerender(<ScrollLock enabled={false} />);
+    expect(countCalls(removeSpy, "wheel")).toBe(1);
+    expect(countCalls(removeSpy, "touchstart")).toBe(1);
+    expect(countCalls(removeSpy, "touchmove")).toBe(1);
+    expect(countCalls(removeSpy, "keydown")).toBe(1);
+  });
+
+  it("allows wheel scrolling in the top-layer allowed container with multiple locks", () => {
+    const { getByRole, getByTestId } = render(<DualScrollLockHarness />);
+    const topScrollable = getByTestId("top-scrollable");
+    const topAllowedChild = getByRole("button", { name: "Top allowed child" });
+
+    defineScrollMetrics(topScrollable, { scrollTop: 10, scrollHeight: 600, clientHeight: 100 });
+
+    const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 60 });
+    topAllowedChild.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  it("keeps outside scrolling blocked with multiple locks and different allowed containers", () => {
+    const { getByRole } = render(<DualScrollLockHarness />);
+    const outside = getByRole("button", { name: "Outside child" });
+    const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 60 });
+
+    outside.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+  });
+
+  describe("layout shift prevention", () => {
+    it("keeps pre-existing body.style.paddingRight unchanged when there is no scrollbar", () => {
+      document.body.style.paddingRight = "12px";
+      vi.spyOn(window, "innerWidth", "get").mockReturnValue(1024);
+      vi.spyOn(document.documentElement, "clientWidth", "get").mockReturnValue(1024);
+      const { rerender } = render(<ScrollLock enabled />);
+
+      expect(document.body.style.paddingRight).toBe("12px");
+
+      rerender(<ScrollLock enabled={false} />);
+
+      expect(document.body.style.paddingRight).toBe("12px");
+    });
+
+    it("adds padding-right equal to the scrollbar width when a scrollbar is present", () => {
+      vi.spyOn(window, "innerWidth", "get").mockReturnValue(1024);
+      vi.spyOn(document.documentElement, "clientWidth", "get").mockReturnValue(1007);
+
+      render(<ScrollLock enabled />);
+
+      expect(document.body.style.paddingRight).toBe("17px");
+    });
+
+    it("restores padding-right to its original value when the lock is released", () => {
+      document.body.style.paddingRight = "8px";
+      vi.spyOn(window, "innerWidth", "get").mockReturnValue(1024);
+      vi.spyOn(document.documentElement, "clientWidth", "get").mockReturnValue(1007);
+      const { rerender } = render(<ScrollLock enabled />);
+
+      expect(document.body.style.paddingRight).toBe("25px");
+
+      rerender(<ScrollLock enabled={false} />);
+
+      expect(document.body.style.paddingRight).toBe("8px");
+    });
+
+    it("keeps padding-right applied until all lock instances release", () => {
+      vi.spyOn(window, "innerWidth", "get").mockReturnValue(1024);
+      vi.spyOn(document.documentElement, "clientWidth", "get").mockReturnValue(1007);
+      const first = render(<ScrollLock enabled />);
+      const second = render(<ScrollLock enabled />);
+
+      expect(document.body.style.paddingRight).toBe("17px");
+
+      first.rerender(<ScrollLock enabled={false} />);
+      expect(document.body.style.paddingRight).toBe("17px");
+
+      second.rerender(<ScrollLock enabled={false} />);
+      expect(document.body.style.paddingRight).toBe("");
+    });
   });
 
   it("prevents wheel events outside the allowed element", () => {

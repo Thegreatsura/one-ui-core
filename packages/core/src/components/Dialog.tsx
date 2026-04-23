@@ -17,6 +17,7 @@ import { Column, Flex, Heading, IconButton, ScrollLock, Text } from ".";
 import {
   DialogContext,
   VisibleDialogLayer,
+  getTopVisibleDialogLayer,
   removeVisibleDialogLayer,
   upsertVisibleDialogLayer,
 } from "../internal/dialogState";
@@ -69,10 +70,21 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
   ) => {
     const dialogRef = useRef<HTMLDivElement>(null);
     const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
+    const wasVisibleRef = useRef(isOpen);
+    const focusRestoredRef = useRef(false);
     const dialogId = useId();
+    const dialogTitleId = `${dialogId}-title`;
     const [isVisible, setIsVisible] = useState(isOpen);
     const [isAnimating, setIsAnimating] = useState(false);
+    const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(() =>
+      typeof document === "undefined" ? null : document.body,
+    );
     const { upsertVisibleDialog, removeVisibleDialog } = useContext(DialogContext);
+    const isCurrentDialogTopVisibleLayer = useCallback(
+      () => getTopVisibleDialogLayer()?.id === dialogId,
+      [dialogId],
+    );
 
     const getPortalContainer = useCallback((): HTMLElement | null => {
       let portalContainer: HTMLElement | null = dialogRef.current;
@@ -102,14 +114,21 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
         id: dialogId,
         dialogElement: dialogRef.current,
         portalContainer,
+        priority: base ? 8 : 9,
       });
-    }, [dialogId, getPortalContainer, isVisible, removeVisibleDialog, upsertVisibleDialog]);
+    }, [base, dialogId, getPortalContainer, isVisible, removeVisibleDialog, upsertVisibleDialog]);
 
     useEffect(() => {
       return () => {
         removeVisibleDialog(dialogId);
       };
     }, [dialogId, removeVisibleDialog]);
+
+    useEffect(() => {
+      if (!portalContainer) {
+        setPortalContainer(document.body);
+      }
+    }, [portalContainer]);
 
     useEffect(() => {
       if (animationTimerRef.current) {
@@ -140,7 +159,7 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
 
     const handleKeyDown = useCallback(
       (event: KeyboardEvent) => {
-        if (event.key === "Escape" && !base) {
+        if (event.key === "Escape" && !base && isCurrentDialogTopVisibleLayer()) {
           onClose();
         }
         if (event.key === "Tab" && dialogRef.current) {
@@ -162,7 +181,7 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
           }
         }
       },
-      [onClose, base],
+      [base, isCurrentDialogTopVisibleLayer, onClose],
     );
 
     useEffect(() => {
@@ -176,6 +195,9 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
 
     useEffect(() => {
       if (isOpen && dialogRef.current) {
+        focusRestoredRef.current = false;
+        previouslyFocusedElementRef.current =
+          document.activeElement instanceof HTMLElement ? document.activeElement : null;
         const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
         );
@@ -183,6 +205,46 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
         firstElement?.focus();
       }
     }, [isOpen]);
+
+    const restoreFocus = useCallback(() => {
+      if (focusRestoredRef.current) return;
+
+      const topLayer = getTopVisibleDialogLayer();
+      const isTopLayer = topLayer?.id === dialogId;
+      const hasOtherVisibleDialog = topLayer !== null && !isTopLayer;
+
+      const previousElement = previouslyFocusedElementRef.current;
+      const isPreviousElementInDocument =
+        previousElement !== null && document.contains(previousElement);
+      const isPreviousElementInTopLayer =
+        isPreviousElementInDocument &&
+        hasOtherVisibleDialog &&
+        topLayer?.dialogElement.contains(previousElement);
+
+      if (hasOtherVisibleDialog && !isPreviousElementInTopLayer) {
+        return;
+      }
+
+      if (isPreviousElementInDocument) {
+        previousElement.focus();
+      }
+
+      focusRestoredRef.current = true;
+    }, [dialogId]);
+
+    useEffect(() => {
+      if (wasVisibleRef.current && !isVisible) {
+        restoreFocus();
+      }
+
+      wasVisibleRef.current = isVisible;
+    }, [isVisible, restoreFocus]);
+
+    useEffect(() => {
+      return () => {
+        restoreFocus();
+      };
+    }, [restoreFocus]);
 
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
@@ -196,7 +258,7 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
         }
 
         if (!dialogRef.current?.contains(event.target as Node)) {
-          if (stack || !base) {
+          if ((stack || !base) && isCurrentDialogTopVisibleLayer()) {
             event.preventDefault();
             onClose();
           }
@@ -213,9 +275,9 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
           document.removeEventListener("mousedown", handleClickOutside, { capture: true });
         };
       }
-    }, [isVisible, onClose, stack, base]);
+    }, [base, isCurrentDialogTopVisibleLayer, isVisible, onClose, stack]);
 
-    if (!isVisible) return null;
+    if (!isVisible || !portalContainer) return null;
 
     return ReactDOM.createPortal(
       <>
@@ -237,7 +299,7 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
         padding="l"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="dialog-title"
+        aria-labelledby={dialogTitleId}
       >
         <Flex
           fill
@@ -296,11 +358,11 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
             >
               <Flex fillWidth horizontal="between" gap="8">
                 {typeof title === "string" ? (
-                  <Heading id="dialog-title" variant="heading-strong-l">
+                  <Heading id={dialogTitleId} variant="heading-strong-l">
                     {title}
                   </Heading>
                 ) : (
-                  title
+                  <div id={dialogTitleId}>{title}</div>
                 )}
                 <IconButton
                   icon="close"
@@ -334,7 +396,7 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
         </Flex>
       </Flex>
       </>,
-      document.body,
+      portalContainer,
     );
   },
 );

@@ -1,6 +1,7 @@
 import React from "react";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { renderToString } from "react-dom/server";
 
 vi.mock(".", async () => {
   const actual = await vi.importActual<typeof import(".")>(".");
@@ -89,9 +90,12 @@ describe("Dialog", () => {
 
     it("sets the required accessibility attributes on the dialog overlay", () => {
       renderDialog();
+      const overlay = getOverlay();
+      const labelledBy = overlay.getAttribute("aria-labelledby");
 
-      expect(getOverlay()).toHaveAttribute("aria-modal", "true");
-      expect(getOverlay()).toHaveAttribute("aria-labelledby", "dialog-title");
+      expect(overlay).toHaveAttribute("aria-modal", "true");
+      expect(labelledBy).toBeTruthy();
+      expect(labelledBy && document.getElementById(labelledBy)).toBeInTheDocument();
     });
 
     it("renders a string title", () => {
@@ -104,6 +108,31 @@ describe("Dialog", () => {
       renderDialog({ title: <span data-testid="custom-title">Custom title</span> });
 
       expect(screen.getByTestId("custom-title")).toBeInTheDocument();
+    });
+
+    it("uses unique aria-labelledby ids for stacked dialogs", () => {
+      renderDialog({ title: "Base dialog", base: true });
+      renderDialog({ title: "Stacked dialog", stack: true });
+
+      const [baseDialog, stackedDialog] = screen.getAllByRole("dialog");
+      const baseLabelId = baseDialog.getAttribute("aria-labelledby");
+      const stackedLabelId = stackedDialog.getAttribute("aria-labelledby");
+
+      expect(baseLabelId).toBeTruthy();
+      expect(stackedLabelId).toBeTruthy();
+      expect(baseLabelId).not.toBe(stackedLabelId);
+      expect(baseLabelId && document.getElementById(baseLabelId)).toBeInTheDocument();
+      expect(stackedLabelId && document.getElementById(stackedLabelId)).toBeInTheDocument();
+    });
+
+    it("labels the dialog correctly when title is a ReactNode", () => {
+      renderDialog({ title: <span>Custom title node</span> });
+
+      const overlay = getOverlay();
+      const labelledBy = overlay.getAttribute("aria-labelledby");
+
+      expect(labelledBy).toBeTruthy();
+      expect(labelledBy && document.getElementById(labelledBy)).toHaveTextContent("Custom title node");
     });
 
     it("renders description when provided", () => {
@@ -231,6 +260,45 @@ describe("Dialog", () => {
       expect(onClose).not.toHaveBeenCalled();
     });
 
+    it("closes only the topmost stacked non-base dialog on Escape", () => {
+      vi.useFakeTimers();
+
+      const StackedEscapeHarness = () => {
+        const [isFirstOpen, setIsFirstOpen] = React.useState(true);
+        const [isSecondOpen, setIsSecondOpen] = React.useState(true);
+
+        return (
+          <>
+            <Dialog
+              {...defaultProps}
+              title="First stacked dialog"
+              isOpen={isFirstOpen}
+              stack
+              onClose={() => setIsFirstOpen(false)}
+            />
+            <Dialog
+              {...defaultProps}
+              title="Second stacked dialog"
+              isOpen={isSecondOpen}
+              stack
+              onClose={() => setIsSecondOpen(false)}
+            />
+          </>
+        );
+      };
+
+      render(<StackedEscapeHarness />, { wrapper: TestProviders });
+
+      expect(screen.getByText("First stacked dialog")).toBeInTheDocument();
+      expect(screen.getByText("Second stacked dialog")).toBeInTheDocument();
+
+      fireEvent.keyDown(document, { key: "Escape" });
+      advanceTimers(300);
+
+      expect(screen.getByText("First stacked dialog")).toBeInTheDocument();
+      expect(screen.queryByText("Second stacked dialog")).not.toBeInTheDocument();
+    });
+
     it("calls onClose when clicking outside while open and not base", () => {
       vi.useFakeTimers();
       const onClose = vi.fn();
@@ -281,6 +349,49 @@ describe("Dialog", () => {
       fireEvent.mouseDown(outside, { button: 0 });
 
       expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("closes only the topmost stacked non-base dialog on outside click", () => {
+      vi.useFakeTimers();
+
+      const StackedOutsideClickHarness = () => {
+        const [isFirstOpen, setIsFirstOpen] = React.useState(true);
+        const [isSecondOpen, setIsSecondOpen] = React.useState(true);
+
+        return (
+          <>
+            <Dialog
+              {...defaultProps}
+              title="First outside dialog"
+              isOpen={isFirstOpen}
+              stack
+              onClose={() => setIsFirstOpen(false)}
+            />
+            <Dialog
+              {...defaultProps}
+              title="Second outside dialog"
+              isOpen={isSecondOpen}
+              stack
+              onClose={() => setIsSecondOpen(false)}
+            />
+          </>
+        );
+      };
+
+      render(<StackedOutsideClickHarness />, { wrapper: TestProviders });
+
+      const outside = document.createElement("div");
+      document.body.appendChild(outside);
+
+      expect(screen.getByText("First outside dialog")).toBeInTheDocument();
+      expect(screen.getByText("Second outside dialog")).toBeInTheDocument();
+
+      advanceTimers(10);
+      fireEvent.mouseDown(outside, { button: 0 });
+      advanceTimers(300);
+
+      expect(screen.getByText("First outside dialog")).toBeInTheDocument();
+      expect(screen.queryByText("Second outside dialog")).not.toBeInTheDocument();
     });
 
     it("does not call onClose when clicking inside the dialog", () => {
@@ -407,6 +518,92 @@ describe("Dialog", () => {
         querySelectorAllSpy.mockRestore();
       }
     });
+
+    it("restores focus to the opener only after close animation completes", () => {
+      vi.useFakeTimers();
+      const opener = document.createElement("button");
+      opener.textContent = "Open dialog";
+      document.body.appendChild(opener);
+      opener.focus();
+
+      try {
+        const { rerender } = renderDialog();
+        expect(document.activeElement).toBe(screen.getByRole("button", { name: /close/i }));
+
+        rerender(<Dialog {...defaultProps} isOpen={false} />);
+
+        expect(document.activeElement).not.toBe(opener);
+
+        advanceTimers(299);
+        expect(document.activeElement).not.toBe(opener);
+
+        advanceTimers(1);
+        expect(document.activeElement).toBe(opener);
+      } finally {
+        opener.remove();
+      }
+    });
+
+    it("restores focus on unmount while still visible", () => {
+      const opener = document.createElement("button");
+      opener.textContent = "Open dialog";
+      document.body.appendChild(opener);
+      opener.focus();
+
+      try {
+        const { unmount } = renderDialog();
+        expect(document.activeElement).toBe(screen.getByRole("button", { name: /close/i }));
+
+        unmount();
+
+        expect(document.activeElement).toBe(opener);
+      } finally {
+        opener.remove();
+      }
+    });
+
+    it("restores focus to a base dialog control after closing a stacked dialog", () => {
+      vi.useFakeTimers();
+
+      const StackedDialogFocusHarness = () => {
+        const [isStackedOpen, setIsStackedOpen] = React.useState(false);
+
+        return (
+          <>
+            <Dialog
+              {...defaultProps}
+              title="Base dialog"
+              base
+              children={
+                <button type="button" onClick={() => setIsStackedOpen(true)}>
+                  Open stacked dialog
+                </button>
+              }
+            />
+            <Dialog
+              {...defaultProps}
+              title="Stacked dialog"
+              stack
+              isOpen={isStackedOpen}
+              onClose={() => setIsStackedOpen(false)}
+            />
+          </>
+        );
+      };
+
+      render(<StackedDialogFocusHarness />, { wrapper: TestProviders });
+      const openStackedButton = screen.getByRole("button", { name: "Open stacked dialog" });
+
+      openStackedButton.focus();
+      fireEvent.click(openStackedButton);
+
+      const stackedCloseButton = screen.getAllByRole("button", { name: /close/i })[1];
+
+      fireEvent.click(stackedCloseButton);
+      advanceTimers(300);
+
+      expect(document.activeElement).toBe(openStackedButton);
+    });
   });
 
   describe("inert state management", () => {
@@ -456,6 +653,47 @@ describe("Dialog", () => {
       advanceTimers(300);
 
       expect(basePanel.inert).toBe(false);
+    });
+
+    it("uses visual stacking priority even when open order differs", () => {
+      renderDialog({ title: "Stacked dialog", stack: true });
+      renderDialog({ title: "Base dialog", base: true });
+
+      const stackedOverlay = screen.getByText("Stacked dialog").closest('[role="dialog"]') as HTMLElement;
+      const baseOverlay = screen.getByText("Base dialog").closest('[role="dialog"]') as HTMLElement;
+      const stackedPanel = getDialogPanel(stackedOverlay) as HTMLElement;
+      const basePanel = getDialogPanel(baseOverlay) as HTMLElement;
+
+      expect(stackedPanel.inert).toBe(false);
+      expect(basePanel.inert).toBe(true);
+    });
+
+    it("recomputes top layer when base changes while visible", () => {
+      const { rerender } = render(
+        <>
+          <Dialog {...defaultProps} title="First dialog" base={false} stack />
+          <Dialog {...defaultProps} title="Second dialog" base />
+        </>,
+        { wrapper: TestProviders },
+      );
+
+      const firstOverlay = screen.getByText("First dialog").closest('[role="dialog"]') as HTMLElement;
+      const secondOverlay = screen.getByText("Second dialog").closest('[role="dialog"]') as HTMLElement;
+      const firstPanel = getDialogPanel(firstOverlay) as HTMLElement;
+      const secondPanel = getDialogPanel(secondOverlay) as HTMLElement;
+
+      expect(firstPanel.inert).toBe(false);
+      expect(secondPanel.inert).toBe(true);
+
+      rerender(
+        <>
+          <Dialog {...defaultProps} title="First dialog" base stack={false} />
+          <Dialog {...defaultProps} title="Second dialog" base />
+        </>,
+      );
+
+      expect(firstPanel.inert).toBe(true);
+      expect(secondPanel.inert).toBe(false);
     });
 
     it("does not leave orphaned inert elements after rapid open and close", () => {
@@ -627,6 +865,33 @@ describe("Dialog", () => {
       );
 
       expect(visibleDialogLayers).toHaveLength(1);
+    });
+  });
+
+  describe("SSR safety", () => {
+    it("does not throw during server render when closed", () => {
+      expect(() => {
+        renderToString(
+          <LayoutProvider>
+            <Dialog {...defaultProps} isOpen={false} />
+          </LayoutProvider>,
+        );
+      }).not.toThrow();
+    });
+
+    it("does not throw during server render when open", () => {
+      vi.stubGlobal("document", undefined);
+      try {
+        expect(() => {
+          renderToString(
+            <LayoutProvider>
+              <Dialog {...defaultProps} isOpen />
+            </LayoutProvider>,
+          );
+        }).not.toThrow();
+      } finally {
+        vi.unstubAllGlobals();
+      }
     });
   });
 });
