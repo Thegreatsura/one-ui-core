@@ -88,6 +88,7 @@ export * from "./Skeleton";
 export * from "./Slider";
 export * from "./SmartLink";
 export * from "./Spinner";
+export * from "./SplitView";
 export * from "./StatusIndicator";
 export * from "./StylePanel";
 export * from "./StyleOverlay";

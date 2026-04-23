@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getPages, getAdjacentPages } from "@/app/utils/utils";
 import { formatDate } from "@/app/utils/formatDate";
-import { Column, Heading, Icon, Row, Media, Text, Card, HeadingNav, Meta, Schema, Button, SmartLink, Line } from "@once-ui-system/core";
+import { Column, Heading, Icon, Row, Media, Text, Card, HeadingNav, Meta, Schema, Button, SmartLink, Line, SplitView } from "@once-ui-system/core";
 import { baseURL, layout, schema } from "@/resources";
 import { CustomMDX } from "@/product/mdx";
 import { Metadata } from "next";
