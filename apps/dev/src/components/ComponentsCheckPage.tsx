@@ -98,6 +98,7 @@ import {
     CountdownFx,
     Input,
     Dialog,
+    FadingLettersFx,
 } from "@once-ui-system/core";
 
 interface ComponentDemo {
@@ -558,115 +559,22 @@ export default function ComponentsCheck() {
             name: "Effects & Animations",
             description: "Visual effects and animation wrappers",
             components: [
-                {
-                    name: "RevealFx",
-                    element: <RevealFx><Heading variant="heading-strong-l">Revealed</Heading></RevealFx>,
-                },
-                {
-                    name: "LetterFx",
-                    element: <Text variant="heading-strong-l"><LetterFx>Letter Effect</LetterFx></Text>,
-                },
-                {
-                    name: "TypeFx",
-                    element: <TypeFx words={["Design", "Build", "Ship", "Iterate"]} speed={80} hold={1500} variant="heading-strong-l" />,
-                },
-                {
-                    name: "CountFx",
-                    element: <CountFx value={2048} variant="display-default-l" />,
-                },
-                {
-                    name: "CountdownFx",
-                    element: <CountdownFx targetDate={new Date(Date.now() + 86400000)} />,
-                },
-                {
-                    name: "Fade",
-                    element: <Fade><Card padding="m" radius="l" background="neutral-medium" fillWidth center><Text>Fade in</Text></Card></Fade>,
-                },
-                {
-                    name: "Pulse",
-                    element: <Pulse><StatusIndicator color="green" /></Pulse>,
-                },
-                {
-                    name: "TiltFx",
-                    element: (
-                        <TiltFx>
-                            <Card padding="l" radius="l" background="neutral-medium" center>
-                                <Column gap="s" center>
-                                    <Icon name="sparkle" size="xl" />
-                                    <Text variant="label-default-s">Move your mouse</Text>
-                                </Column>
-                            </Card>
-                        </TiltFx>
-                    ),
-                },
-                {
-                    name: "FlipFx",
-                    element: (
-                        <FlipFx
-                            fillWidth
-                            front={<Card padding="l" radius="l" background="brand-medium" center fillWidth><Text onBackground="brand-strong">Front</Text></Card>}
-                            back={<Card padding="l" radius="l" background="accent-medium" center fillWidth><Text onBackground="accent-strong">Back</Text></Card>}
-                        />
-                    ),
-                },
-                {
-                    name: "GlitchFx",
-                    element: <GlitchFx><Heading variant="heading-strong-l">Glitch</Heading></GlitchFx>,
-                },
-                {
-                    name: "HoloFx",
-                    element: (
-                        <HoloFx>
-                            <Card padding="l" radius="l" background="neutral-medium" center>
-                                <Text variant="heading-strong-m">Holographic</Text>
-                            </Card>
-                        </HoloFx>
-                    ),
-                },
-                {
-                    name: "MatrixFx",
-                    element: (
-                        <MatrixFx>
-                            <Card padding="l" radius="l" background="neutral-medium" center>
-                                <Text variant="heading-strong-m">Matrix</Text>
-                            </Card>
-                        </MatrixFx>
-                    ),
-                },
-                {
-                    name: "ShineFx",
-                    element: (
-                        <ShineFx>
-                            <Card padding="l" radius="l" background="neutral-medium" center fillWidth>
-                                <Text variant="heading-strong-m">Shine</Text>
-                            </Card>
-                        </ShineFx>
-                    ),
-                },
-                {
-                    name: "WeatherFx",
-                    element: (
-                        <WeatherFx>
-                            <Card padding="l" radius="l" background="neutral-medium" center fillWidth>
-                                <Text variant="heading-strong-m">Weather</Text>
-                            </Card>
-                        </WeatherFx>
-                    ),
-                },
-                {
-                    name: "Hover",
-                    element: (
-                        <Hover
-                            trigger={<Text variant="label-default-s">Hover trigger</Text>}
-                            overlay={<Column background="overlay" />}
-                            onClick={() => {}}
-                        >
-                            <Card padding="l" radius="l" background="neutral-medium" center fillWidth>
-                                <Text>Hover target</Text>
-                            </Card>
-                        </Hover>
-                    ),
-                },
+                { name: "RevealFx", element: <RevealFx><Text>Reveal Effect</Text></RevealFx> },
+                { name: "LetterFx", element: <LetterFx>Letter Effect</LetterFx> },
+                { name: "TypeFx", element: <TypeFx words="Type Effect">Type Effect</TypeFx> },
+                { name: "CountFx", element: <CountFx value={100} /> },
+                { name: "CountdownFx", element: <CountdownFx targetDate={new Date(Date.now() + 3600000)} /> },
+                { name: "Fade", element: <Fade><Text>Fade Effect</Text></Fade> },
+                { name: "Pulse", element: <Pulse><Text>Pulse Effect</Text></Pulse> },
+                { name: "Hover", element: <Hover trigger={<Text>Test</Text>} overlay={<Column background="overlay"></Column>} onClick={(e) => console.log(e)}><Text>Hover Effect</Text></Hover> },
+                { name: "FlipFx", element: <FlipFx back={<Text>Back</Text>} front={<Text>Front</Text>} onClick={(e) => console.log(e)}><Text>Flip Effect</Text></FlipFx> },
+                { name: "GlitchFx", element: <GlitchFx><Text>Glitch Effect</Text></GlitchFx> },
+                { name: "HoloFx", element: <HoloFx><Text>Holo Effect</Text></HoloFx> },
+                { name: "MatrixFx", element: <MatrixFx><Text>Matrix Effect</Text></MatrixFx> },
+                { name: "ShineFx", element: <ShineFx><Text>Shine Effect</Text></ShineFx> },
+                { name: "TiltFx", element: <TiltFx><Text>Tilt Effect</Text></TiltFx> },
+                { name: "WeatherFx", element: <WeatherFx><Text>Weather Effect</Text></WeatherFx> },
+                { name: "FadingLettersFx", element: <FadingLettersFx text="Fading Letters Effect" animationState="entering" variant="heading-strong-m" /> },
             ],
         },
         {
