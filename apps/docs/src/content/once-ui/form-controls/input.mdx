@@ -252,7 +252,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   ]}
 />
 
-## Sizes
+## Size
 
 The Input component supports five sizes: extra small, small, medium, large, and extra large.
 
@@ -261,11 +261,11 @@ The Input component supports five sizes: extra small, small, medium, large, and 
   marginBottom="24"
   preview={
     <Column fillWidth gap="16">
-      <Input id="size-xs" placeholder="Extra Small" height="xs" />
-      <Input id="size-s" placeholder="Small" height="s" />
-      <Input id="size-m" placeholder="Medium" height="m" />
-      <Input id="size-l" placeholder="Large" height="l" />
-      <Input id="size-xl" placeholder="Extra Large" height="xl" />
+      <Input id="size-xs" label="Extra Small" height="xs" />
+      <Input id="size-s" label="Small" height="s" />
+      <Input id="size-m" label="Medium" height="m" />
+      <Input id="size-l" label="Large" height="l" />
+      <Input id="size-xl" label="Extra Large" height="xl" />
     </Column>
   }
   codes={[
@@ -278,6 +278,30 @@ The Input component supports five sizes: extra small, small, medium, large, and 
 <Input placeholder="Extra Large" height="xl" />`,
       language: "tsx",
       label: "Sizes"
+    }
+  ]}
+ />
+
+## Variants
+
+The Input component supports two variants: `default` and `ghost`.
+
+<CodeBlock
+  marginTop="16"
+  marginBottom="24"
+  preview={
+    <Column fillWidth gap="16">
+      <Input id="variant-default" label="Default" variant="default" />
+      <Input id="variant-ghost" label="Ghost" variant="ghost" />
+    </Column>
+  }
+  codes={[
+    {
+      code:
+`<Input placeholder="Default" variant="default" />
+<Input placeholder="Ghost" variant="ghost" />`,
+      language: "tsx",
+      label: "Variants"
     }
   ]}
  />
