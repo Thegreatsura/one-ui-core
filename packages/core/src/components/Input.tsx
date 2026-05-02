@@ -35,6 +35,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   style?: React.CSSProperties;
   hasPrefix?: ReactNode;
   hasSuffix?: ReactNode;
+  variant?: "default" | "ghost";
   characterCount?: boolean;
   cursor?: undefined | "interactive";
   validate?: (value: ReactNode) => ReactNode | null;
@@ -56,6 +57,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       style,
       hasPrefix,
       hasSuffix,
+      variant = "default",
       characterCount,
       loading = false,
       children,
@@ -116,7 +118,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     const displayError = validationError || errorMessage;
 
     const fontSizeMap = {
-      xs: "font-s",
+      xs: "font-xs",
       s: "font-s",
       m: "font-m",
       l: "font-l",
@@ -152,8 +154,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       >
         <Row
           transition="micro-medium"
-          border="neutral-medium"
-          background="neutral-alpha-weak"
+          border={variant === "ghost" ? "transparent" : "neutral-medium"}
+          background={variant === "ghost" ? "transparent" : "neutral-alpha-weak"}
           overflow="hidden"
           vertical="stretch"
           className={classNames(
