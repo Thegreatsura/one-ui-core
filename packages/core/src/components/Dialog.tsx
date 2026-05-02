@@ -281,7 +281,7 @@ const Dialog: React.FC<DialogProps> = forwardRef<HTMLDivElement, DialogProps>(
 
     return ReactDOM.createPortal(
       <>
-        <ScrollLock enabled={isOpen} allowScrollInElement={dialogRef} />
+        <ScrollLock enabled={isOpen && !base} allowScrollInElement={dialogRef} />
         <Flex
         ref={ref}
         transition="macro-medium"

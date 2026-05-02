@@ -752,6 +752,23 @@ describe("Dialog", () => {
       second.rerender(<Dialog {...defaultProps} title="Second dialog" isOpen={false} stack />);
       expect(document.body.style.overflow).toBe("");
     });
+
+    it("does not prevent Space key in a stacked dialog's input from the base dialog", () => {
+      renderDialog({ title: "Base dialog", base: true });
+      renderDialog({
+        title: "Stacked dialog",
+        stack: true,
+        children: <textarea data-testid="stacked-textarea" />,
+      });
+
+      const textarea = screen.getByTestId("stacked-textarea");
+
+      // Space inside the stacked dialog's textarea must not be defaultPrevented
+      // by a background (base) dialog's ScrollLock.
+      const spaceEvent = createEvent.keyDown(textarea, { key: " " });
+      fireEvent(textarea, spaceEvent);
+      expect(spaceEvent.defaultPrevented).toBe(false);
+    });
   });
 
   describe("onHeightChange callback", () => {
