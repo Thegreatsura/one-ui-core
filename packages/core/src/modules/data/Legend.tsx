@@ -7,7 +7,7 @@ import { useDataTheme } from "../../contexts/DataThemeProvider";
 import { ChartVariant } from "./interfaces";
 
 interface LegendProps {
-  payload?: any[];
+  payload?: readonly any[];
   labels?: "x" | "y" | "both" | "none";
   colors?: string[];
   reverseY?: boolean;
