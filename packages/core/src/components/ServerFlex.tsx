@@ -315,6 +315,7 @@ const ServerFlex = forwardRef<HTMLDivElement, ComponentProps>(
       fill && "min-height-0",
       fill && "min-width-0",
       (fillWidth || maxWidth) && "fill-width",
+      maxWidth && ["xs", "s", "m", "l", "xl"].includes(maxWidth as string) && `max-width-${maxWidth}`,
       (fillHeight || maxHeight) && "fill-height",
       shadow && `shadow-${shadow}`,
       zIndex && `z-index-${zIndex}`,
@@ -476,7 +477,7 @@ const ServerFlex = forwardRef<HTMLDivElement, ComponentProps>(
         : undefined;
 
     const combinedStyle: CSSProperties = {
-      maxWidth: parseDimension(maxWidth, "width"),
+      maxWidth: ["xs", "s", "m", "l", "xl"].includes(maxWidth as string) ? undefined : parseDimension(maxWidth, "width"),
       minWidth: parseDimension(minWidth, "width"),
       minHeight: parseDimension(minHeight, "height"),
       maxHeight: parseDimension(maxHeight, "height"),

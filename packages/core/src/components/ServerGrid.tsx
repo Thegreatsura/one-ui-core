@@ -206,6 +206,7 @@ const ServerGrid = forwardRef<HTMLDivElement, ComponentProps>(
       fitHeight && "fit-height",
       fill && "fill",
       (fillWidth || maxWidth) && "fill-width",
+      maxWidth && ["xs", "s", "m", "l", "xl"].includes(maxWidth as string) && `max-width-${maxWidth}`,
       (fillHeight || maxHeight) && "fill-height",
       columns && `columns-${columns}`,
       overflow && `overflow-${overflow}`,
@@ -390,7 +391,7 @@ const ServerGrid = forwardRef<HTMLDivElement, ComponentProps>(
         : undefined;
 
     const combinedStyle: CSSProperties = {
-      maxWidth: parseDimension(maxWidth, "width"),
+      maxWidth: ["xs", "s", "m", "l", "xl"].includes(maxWidth as string) ? undefined : parseDimension(maxWidth, "width"),
       minWidth: parseDimension(minWidth, "width"),
       minHeight: parseDimension(minHeight, "height"),
       maxHeight: parseDimension(maxHeight, "height"),

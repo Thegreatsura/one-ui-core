@@ -137,50 +137,11 @@ export default function ComponentsCheck() {
             name: "Layout",
             description: "Core layout primitives for structuring content",
             components: [
-                {
-                    name: "Column",
-                    element: (
-                        <Column padding="m" gap="s" background="neutral-medium" radius="l" fillWidth>
-                            <Flex padding="s" background="neutral-strong" radius="m"><Text variant="label-default-s" onBackground="neutral-strong">Item 1</Text></Flex>
-                            <Flex padding="s" background="neutral-strong" radius="m"><Text variant="label-default-s" onBackground="neutral-strong">Item 2</Text></Flex>
-                            <Flex padding="s" background="neutral-strong" radius="m"><Text variant="label-default-s" onBackground="neutral-strong">Item 3</Text></Flex>
-                        </Column>
-                    ),
-                },
-                {
-                    name: "Row",
-                    element: (
-                        <Row padding="m" gap="s" background="neutral-medium" radius="l" fillWidth>
-                            <Flex padding="s" background="neutral-strong" radius="m" flex={1}><Text variant="label-default-s" onBackground="neutral-strong">A</Text></Flex>
-                            <Flex padding="s" background="neutral-strong" radius="m" flex={1}><Text variant="label-default-s" onBackground="neutral-strong">B</Text></Flex>
-                            <Flex padding="s" background="neutral-strong" radius="m" flex={1}><Text variant="label-default-s" onBackground="neutral-strong">C</Text></Flex>
-                        </Row>
-                    ),
-                },
-                {
-                    name: "Grid",
-                    element: (
-                        <Grid columns="3" gap="s" fillWidth>
-                            {[1, 2, 3, 4, 5, 6].map((n) => (
-                                <Flex key={n} padding="m" background="neutral-medium" radius="m" center>
-                                    <Text variant="label-default-s">{n}</Text>
-                                </Flex>
-                            ))}
-                        </Grid>
-                    ),
-                },
-                {
-                    name: "Flex",
-                    element: (
-                        <Flex wrap gap="s" fillWidth>
-                            {["Flex", "Wrap", "Items"].map((label) => (
-                                <Flex key={label} padding="s" paddingX="m" background="brand-medium" radius="full">
-                                    <Text variant="label-default-s" onBackground="brand-strong">{label}</Text>
-                                </Flex>
-                            ))}
-                        </Flex>
-                    ),
-                },
+                { name: "Column", element: <Column padding="m" background="neutral-medium" radius="l"><Text>Column Layout</Text></Column> },
+                { name: "Row", element: <Row padding="m" background="neutral-medium" radius="l"><Text>Row Layout</Text></Row> },
+                { name: "Flex", element: <Flex padding="m" background="neutral-medium" radius="l"><Text>Flex Layout</Text></Flex> },
+                { name: "Flex maxWidth", element: <Flex maxWidth="xl" padding="m" background="brand-medium" radius="l"><Text onBackground="brand-strong">maxWidth="xl"</Text></Flex> },
+                { name: "Grid", element: <Grid columns="2" gap="m" fillWidth><Column padding="m" background="neutral-medium" radius="l"><Text>Grid 1</Text></Column><Column padding="m" background="neutral-medium" radius="l"><Text>Grid 2</Text></Column></Grid> },
             ],
         },
         {
