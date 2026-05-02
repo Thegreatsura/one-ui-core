@@ -3,9 +3,9 @@ import '@once-ui-system/core/css/tokens.css';
 
 import classNames from "classnames";
 
-import { Background, Column, Flex, ThemeInit } from "@once-ui-system/core";
-import { dataStyle, effects, style } from "../resources/once-ui.config";
-import { Providers } from "../components/Providers";
+import { Column, Flex, ThemeInit } from "@once-ui-system/core";
+import { dataStyle, style } from "@/resources/once-ui.config";
+import { Providers } from "@/components/Providers";
 
 import { Geist } from "next/font/google";
 import { Geist_Mono } from "next/font/google";
@@ -77,57 +77,7 @@ export default function RootLayout({
           />
         </head>
         <Providers>
-          <Column background="page" as="body" fillWidth margin="0" padding="0" style={{ minHeight: "100vh" }}>
-          <Background
-            position="absolute"
-            top="0"
-            left="0"
-            mask={{
-              cursor: effects.mask.cursor,
-              x: effects.mask.x,
-              y: effects.mask.y,
-                radius: effects.mask.radius,
-              }}
-              gradient={{
-                display: effects.gradient.display,
-                x: effects.gradient.x,
-                y: effects.gradient.y,
-                width: effects.gradient.width,
-                height: effects.gradient.height,
-                tilt: effects.gradient.tilt,
-                colorStart: effects.gradient.colorStart,
-                colorEnd: effects.gradient.colorEnd,
-                opacity: effects.gradient.opacity as
-                  | 0
-                  | 10
-                  | 20
-                  | 30
-                  | 40
-                  | 50
-                  | 60
-                  | 70
-                  | 80
-                  | 90
-                  | 100,
-              }}
-              dots={{
-                display: effects.dots.display,
-                color: effects.dots.color,
-                size: effects.dots.size as any,
-                opacity: effects.dots.opacity as any,
-              }}
-              grid={{
-                display: effects.grid.display,
-                color: effects.grid.color,
-                width: effects.grid.width as any,
-                height: effects.grid.height as any,
-                opacity: effects.grid.opacity as any,
-              }}
-              lines={{
-                display: effects.lines.display,
-                opacity: effects.lines.opacity as any,
-              }}
-            />
+          <Column background="page" as="body" fillWidth margin="0" padding="0" minHeight="100vh">
             <Flex
               fillWidth
               padding="l"
