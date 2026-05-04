@@ -11,9 +11,6 @@
     },
     "lint": {
       "outputs": []
-    },
-    "test": {
-      "outputs": []
     }
   }
 }

@@ -16,5 +16,5 @@
     "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "src/test/**", "**/*.test.*", "**/*.stories.*"]
+  "exclude": ["node_modules", "dist", "**/*.test.*", "**/*.stories.*"]
 }

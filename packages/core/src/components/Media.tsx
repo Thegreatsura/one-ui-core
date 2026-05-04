@@ -14,7 +14,7 @@ export interface MediaProps extends React.ComponentProps<typeof Flex> {
   enlarge?: boolean;
   src: string;
   unoptimized?: boolean;
-  sizes?: string;
+  sizes?: string | number;
   priority?: boolean;
   caption?: ReactNode;
   fill?: boolean;
@@ -147,6 +147,10 @@ const Media: React.FC<MediaProps> = ({
 
   const isVideo = src?.endsWith(".mp4");
   const isYouTube = isYouTubeVideo(src);
+  const resolvedSizes =
+    typeof sizes === "number"
+      ? `(max-width: ${sizes}px) 100vw, ${sizes}px`
+      : sizes;
 
   return (
     <>
@@ -224,7 +228,7 @@ const Media: React.FC<MediaProps> = ({
             <Image
               src={src}
               alt={alt}
-              sizes={isEnlarged ? "100vw" : sizes}
+              sizes={isEnlarged ? "100vw" : resolvedSizes}
               priority={priority}
               unoptimized={unoptimized}
               fill={fill || !aspectRatio}
