@@ -82,8 +82,10 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                 fillHeight
                 position="static"
                 borderBottom="neutral-medium"
+                transition="micro-medium"
+                vertical="center"
                 paddingX="4"
-                className={classNames(styles.stepper, "transition-micro-medium")}
+                className={classNames(styles.stepper)}
               >
                 <IconButton
                   icon="chevronUp"
@@ -96,8 +98,10 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
               <Flex
                 fillHeight
                 position="static"
+                vertical="center"
+                transition="micro-medium"
                 paddingX="4"
-                className={classNames(styles.stepper, "transition-micro-medium")}
+                className={classNames(styles.stepper)}
               >
                 <IconButton
                   icon="chevronDown"

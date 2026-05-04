@@ -212,6 +212,9 @@ The component auto-detects and renders YouTube links, just pass a YouTube URL to
     <Media
       src="https://www.youtube.com/watch?v=TQT_FSdxbC8"
       aspectRatio="16/9"
+      autoplay={false}
+      controls={true}
+      sound={true}
       radius="xl"
     />
   }
@@ -221,6 +224,9 @@ The component auto-detects and renders YouTube links, just pass a YouTube URL to
 `<Media
     src="https://www.youtube.com/watch?v=TQT_FSdxbC8"
     aspectRatio="16/9"
+    autoplay={false}
+    controls={true}
+    sound={true}
     radius="xl"
 />`,
       language: "tsx",
@@ -243,6 +249,10 @@ The component auto-detects and renders YouTube links, just pass a YouTube URL to
     ["priority", "boolean"],
     ["unoptimized", "boolean"],
     ["sizes", "string", "100vw"],
+    ["loop", "boolean", "true"],
+    ["autoplay", "boolean", "true"],
+    ["sound", "boolean", "false"],
+    ["controls", "boolean", "false"],
     ["className"],
     ["style"],
     ["...flex"]

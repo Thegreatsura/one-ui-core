@@ -3,7 +3,7 @@
 import React, { ReactNode, RefObject, useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import classNames from "classnames";
-import { Language, SpacingToken } from "../../types";
+import { SpacingToken } from "../../types";
 import Prism from "prismjs";
 import styles from "./CodeBlock.module.scss";
 import {

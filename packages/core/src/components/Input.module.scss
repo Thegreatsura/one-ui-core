@@ -51,11 +51,7 @@
 }
 
 .textareaLabel {
-    top: var(--static-space-16);
-
-    &.floating {
-        transform: scale(0.75) translateY(calc(-1 * var(--static-space-16)));
-    }
+    top: var(--static-space-12);
 }
 
 .xs {
@@ -122,6 +118,7 @@
     color: var(--neutral-on-background-strong);
     padding: 0 var(--static-space-16);
     outline: none;
+    border-radius: var(--radius-8);
 
     &.placeholder {
         padding-top: 0;

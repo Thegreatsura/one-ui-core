@@ -15,17 +15,20 @@ FadingLettersFx creates beautiful letter-by-letter animations with precise timin
 <CodeBlock
   marginTop="16"
   marginBottom="24"
+  reloadButton
   preview={
     <FadingLettersFx
+      align="center"
       text="Welcome to Once UI"
       animationState="entering"
-      variant="display-strong-l"
+      variant="display-strong-m"
     />
   }
   codes={[
     {
       code:
 `<FadingLettersFx
+    align="center"
     text="Welcome to Once UI"
     animationState="entering"
     variant="display-strong-l" />`,
@@ -37,7 +40,32 @@ FadingLettersFx creates beautiful letter-by-letter animations with precise timin
 
 ## Animation States
 
-The component supports three distinct animation states:
+The component supports three distinct animation states: `entering`, `visible`, and `exiting`.
+
+<CodeBlock
+  marginTop="16"
+  marginBottom="24"
+  reloadButton
+  preview={
+    <Column fillWidth gap="16">
+      <Row fillWidth><FadingLettersFx text="Entering Animation" animationState="entering" variant="heading-strong-m" /></Row>
+      <Row fillWidth><FadingLettersFx text="Visible State" animationState="visible" variant="heading-strong-m" /></Row>
+      <Row fillWidth><FadingLettersFx text="Exiting Animation" animationState="exiting" variant="heading-strong-m" /></Row>
+    </Column>
+  }
+  codes={[
+    {
+      code:
+`<Column gap="16">
+    <FadingLettersFx text="Entering Animation" animationState="entering" variant="heading-strong-m" />
+    <FadingLettersFx text="Visible State" animationState="visible" variant="heading-strong-m" />
+    <FadingLettersFx text="Exiting Animation" animationState="exiting" variant="heading-strong-m" />
+</Column>`,
+      language: "tsx",
+      label: "Animation States"
+    }
+  ]}
+/>
 
 ### Entering
 Letters fade in sequentially with a blur-to-focus effect and scale transformation. Each letter has a calculated delay based on its position in the word and message.
@@ -48,54 +76,31 @@ Letters remain static without animation. Use this state when no animation is act
 ### Exiting
 Letters fade out with blur and scale effects. Each letter has a random exit delay for an organic dissolution effect.
 
-<CodeBlock
-  marginTop="16"
-  marginBottom="24"
-  preview={
-    <Column gap="16">
-      <FadingLettersFx text="Entering Animation" animationState="entering" variant="heading-strong-m" />
-      <FadingLettersFx text="Visible State" animationState="visible" variant="heading-strong-m" />
-      <FadingLettersFx text="Exiting Animation" animationState="exiting" variant="heading-strong-m" />
-    </Column>
-  }
-  codes={[
-    {
-      code:
-`<Column gap="16">
-  <FadingLettersFx text="Entering Animation" animationState="entering" variant="heading-strong-m" />
-  <FadingLettersFx text="Visible State" animationState="visible" variant="heading-strong-m" />
-  <FadingLettersFx text="Exiting Animation" animationState="exiting" variant="heading-strong-m" />
-</Column>`,
-      language: "tsx",
-      label: "Animation States"
-    }
-  ]}
-/>
-
-## Message Staggering
+## Staggering
 
 Use the `messageIdx` prop to create staggered animations across multiple messages. Each increment adds 2500ms of base delay.
 
 <CodeBlock
   marginTop="16"
   marginBottom="24"
+  reloadButton
   preview={
-    <Column gap="12">
-      <FadingLettersFx text="First message appears" animationState="entering" messageIdx={0} variant="body-default-l" />
-      <FadingLettersFx text="Second message appears" animationState="entering" messageIdx={1} variant="body-default-l" />
-      <FadingLettersFx text="Third message appears" animationState="entering" messageIdx={2} variant="body-default-l" />
+    <Column fillWidth gap="12">
+      <Row fillWidth><FadingLettersFx text="First message appears" animationState="entering" messageIdx={0} variant="body-default-l" /></Row>
+      <Row fillWidth><FadingLettersFx text="Second message appears" animationState="entering" messageIdx={1} variant="body-default-l" /></Row>
+      <Row fillWidth><FadingLettersFx text="Third message appears" animationState="entering" messageIdx={2} variant="body-default-l" /></Row>
     </Column>
   }
   codes={[
     {
       code:
 `<Column gap="12">
-  <FadingLettersFx text="First message appears" animationState="entering" messageIdx={0} variant="body-default-l" />
-  <FadingLettersFx text="Second message appears" animationState="entering" messageIdx={1} variant="body-default-l" />
-  <FadingLettersFx text="Third message appears" animationState="entering" messageIdx={2} variant="body-default-l" />
+    <FadingLettersFx text="First message appears" animationState="entering" messageIdx={0} variant="body-default-l" />
+    <FadingLettersFx text="Second message appears" animationState="entering" messageIdx={1} variant="body-default-l" />
+    <FadingLettersFx text="Third message appears" animationState="entering" messageIdx={2} variant="body-default-l" />
 </Column>`,
       language: "tsx",
-      label: "Message Staggering"
+      label: "Staggering"
     }
   ]}
 />
@@ -107,13 +112,13 @@ FadingLettersFx extends the Once UI Text component, so you can use all Text prop
 <CodeBlock
   marginTop="16"
   marginBottom="24"
+  reloadButton
   preview={
     <FadingLettersFx
       text="Custom styled text"
       animationState="entering"
       variant="display-strong-s"
-      onBackground="brand-strong"
-      style={{ marginTop: '1rem' }}
+      onBackground="brand-weak"
     />
   }
   codes={[
@@ -123,8 +128,7 @@ FadingLettersFx extends the Once UI Text component, so you can use all Text prop
     text="Custom styled text"
     animationState="entering"
     variant="display-strong-s"
-    onBackground="brand-strong"
-    style={{ marginTop: '1rem' }} />`,
+    onBackground="brand-weak" />`,
       language: "tsx",
       label: "Custom Styling"
     }
@@ -145,14 +149,13 @@ The animation timing follows a precise formula:
 
 <PropsTable
   content={[
-    ["text", "string", "", "The text content to animate"],
-    ["animationState", ["entering", "visible", "exiting"], "visible", "Current animation state"],
-    ["messageIdx", "number", "0", "Index for message staggering (adds 2500ms per increment)"],
-    ["variant", "TextVariant", "body-default-m", "Text variant from Once UI Text component"],
-    ["onBackground", "ColorToken", "neutral-strong", "Text color token"],
-    ["className", "string", "", "Additional CSS classes"],
-    ["style", "React.CSSProperties", "", "Inline styles"],
-    ["children", "React.ReactNode", "", "Not used - text comes from text prop"],
+    ["text", "string"],
+    ["animationState", ["entering", "visible", "exiting"], "visible"],
+    ["messageIdx", "number", "0"],
+    ["variant", "TextVariant", "body-default-m"],
+    ["onBackground", "ColorToken", "neutral-strong"],
+    ["children", "React.ReactNode"],
+    ["text", "...TextProps"],
   ]}
 />
 
