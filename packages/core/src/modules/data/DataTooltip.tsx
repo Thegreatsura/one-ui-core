@@ -8,8 +8,8 @@ import { ChartVariant, DateConfig } from "./interfaces";
 
 interface DataTooltipProps {
   active?: boolean;
-  payload?: any[];
-  label?: string;
+  payload?: readonly any[];
+  label?: string | number;
   dataKey?: string;
   DataTooltip?: React.ReactNode;
   date?: DateConfig;

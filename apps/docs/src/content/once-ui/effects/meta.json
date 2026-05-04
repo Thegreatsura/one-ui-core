@@ -8,6 +8,7 @@
     "countdownFx": 3,
     "shineFx": 4,
     "typeFx": 5,
-    "tiltFx": 6
+    "tiltFx": 6,
+    "fadingLettersFx": 7
   }
 }

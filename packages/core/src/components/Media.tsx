@@ -19,6 +19,10 @@ export interface MediaProps extends React.ComponentProps<typeof Flex> {
   caption?: ReactNode;
   fill?: boolean;
   fillWidth?: boolean;
+  loop?: boolean;
+  autoplay?: boolean;
+  sound?: boolean;
+  controls?: boolean;
   style?: CSSProperties;
   className?: string;
 }
@@ -37,6 +41,10 @@ const Media: React.FC<MediaProps> = ({
   height,
   priority,
   caption,
+  loop = true,
+  autoplay = true,
+  sound = false,
+  controls = false,
   style,
   className,
   ...rest
@@ -124,9 +132,17 @@ const Media: React.FC<MediaProps> = ({
     const match = url.match(
       /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
     );
-    return match
-      ? `https://www.youtube.com/embed/${match[1]}?controls=0&rel=0&modestbranding=1`
-      : "";
+    if (!match) return "";
+
+    const id = match[1];
+    let embedUrl = `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
+
+    if (!controls) embedUrl += "&controls=0";
+    if (autoplay) embedUrl += "&autoplay=1";
+    if (!sound) embedUrl += "&mute=1";
+    if (loop) embedUrl += `&loop=1&playlist=${id}`;
+
+    return embedUrl;
   };
 
   const isVideo = src?.endsWith(".mp4");
@@ -184,9 +200,9 @@ const Media: React.FC<MediaProps> = ({
           {!loading && isVideo && (
             <video
               src={src}
-              autoPlay
-              loop
-              muted
+              autoPlay={autoplay}
+              loop={loop}
+              muted={!sound}
               playsInline
               style={{
                 width: "100%",
@@ -201,7 +217,7 @@ const Media: React.FC<MediaProps> = ({
               height="100%"
               src={getYouTubeEmbedUrl(src)}
               frameBorder="0"
-              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               style={{
                 objectFit: objectFit,

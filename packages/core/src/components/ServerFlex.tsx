@@ -315,6 +315,7 @@ const ServerFlex = forwardRef<HTMLDivElement, ComponentProps>(
       fill && "min-height-0",
       fill && "min-width-0",
       (fillWidth || maxWidth) && "fill-width",
+      maxWidth && ["xs", "s", "m", "l", "xl"].includes(maxWidth as string) && `max-width-${maxWidth}`,
       (fillHeight || maxHeight) && "fill-height",
       shadow && `shadow-${shadow}`,
       zIndex && `z-index-${zIndex}`,
@@ -343,10 +344,10 @@ const ServerFlex = forwardRef<HTMLDivElement, ComponentProps>(
           cascadedS?.hide === false && "s-flex-show",
           cascadedXs?.hide === true && "xs-flex-hide",
           cascadedXs?.hide === false && "xs-flex-show",
-          cascadedL?.direction && `l-flex-${cascadedL.direction}`,
-          cascadedM?.direction && `m-flex-${cascadedM.direction}`,
-          cascadedS?.direction && `s-flex-${cascadedS.direction}`,
-          cascadedXs?.direction && `xs-flex-${cascadedXs.direction}`,
+          l?.direction && `l-flex-${l.direction}`,
+          m?.direction && `m-flex-${m.direction}`,
+          s?.direction && `s-flex-${s.direction}`,
+          xs?.direction && `xs-flex-${xs.direction}`,
           cascadedL?.horizontal &&
             (cascadedL?.direction === "row" ||
             cascadedL?.direction === "row-reverse" ||
@@ -476,7 +477,7 @@ const ServerFlex = forwardRef<HTMLDivElement, ComponentProps>(
         : undefined;
 
     const combinedStyle: CSSProperties = {
-      maxWidth: parseDimension(maxWidth, "width"),
+      maxWidth: ["xs", "s", "m", "l", "xl"].includes(maxWidth as string) ? undefined : parseDimension(maxWidth, "width"),
       minWidth: parseDimension(minWidth, "width"),
       minHeight: parseDimension(minHeight, "height"),
       maxHeight: parseDimension(maxHeight, "height"),

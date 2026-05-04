@@ -32,6 +32,11 @@ const roadmap = [
         title: "Done",
         tasks: [
           {
+            title: "Once UI 1.7",
+            description: "New components and component improvements.",
+            type: "feature"
+          },
+          {
             title: "Once UI 1.6",
             description: "New components and accessibility improvements.",
             type: "feature"

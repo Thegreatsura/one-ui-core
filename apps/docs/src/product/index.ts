@@ -34,5 +34,5 @@ export * from "./CelebrationFxExample";
 export * from "./WeatherFxExample";
 export * from "./MatrixFxExample";
 export * from "./LineChartStreamingExample";
+export * from "./ModalExamples";
 export * from "./SliderExamples"
-

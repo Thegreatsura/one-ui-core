@@ -6,6 +6,8 @@ docs: "once-ui/components/media.mdx"
 github: "components/Media.tsx"
 navLabel: "Media"
 navIcon: "components"
+navTag: "Update"
+navTagVariant: "indigo"
 ---
 
 `Media` handles responsive media content with support for lazy loading, aspect ratios, and intelligent rendering of videos or embeds. Use it for dynamic content blocks with consistent behavior.
@@ -35,40 +37,6 @@ navIcon: "components"
 />`,
       language: "tsx",
       label: "Media"
-    }
-  ]}
-/>
-
-## Sizes shorthand
-
-You can pass a number to `sizes` for a common responsive pattern.
-
-`sizes={768}` expands to `(max-width: 768px) 100vw, 768px`.
-
-<CodeBlock
-  marginTop="16"
-  marginBottom="24"
-  preview={
-    <Media
-      sizes={768}
-      src="/images/docs/once-ui/vibe-coding-light.jpg"
-      alt="Preview"
-      radius="xl"
-      border="neutral-alpha-medium"
-    />
-  }
-  codes={[
-    {
-      code:
-`<Media
-    src="/image.jpg"
-    alt="Preview"
-    sizes={768}
-    radius="xl"
-    border="neutral-alpha-medium"
-/>`,
-      language: "tsx",
-      label: "Sizes shorthand"
     }
   ]}
 />
@@ -232,6 +200,40 @@ Use the `fill` prop to make the media fill its container.
   ]}
 />
 
+## Sizes shorthand
+
+You can pass a number to `sizes` for a common responsive pattern.
+
+`sizes={768}` expands to `(max-width: 768px) 100vw, 768px`.
+
+<CodeBlock
+  marginTop="16"
+  marginBottom="24"
+  preview={
+    <Media
+      sizes={768}
+      src="/images/docs/once-ui/vibe-coding-light.jpg"
+      alt="Preview"
+      radius="xl"
+      border="neutral-alpha-medium"
+    />
+  }
+  codes={[
+    {
+      code:
+`<Media
+    src="/image.jpg"
+    alt="Preview"
+    sizes={768}
+    radius="xl"
+    border="neutral-alpha-medium"
+/>`,
+      language: "tsx",
+      label: "Sizes shorthand"
+    }
+  ]}
+/>
+
 ## YouTube
 
 The component auto-detects and renders YouTube links, just pass a YouTube URL to the `src` prop.
@@ -244,6 +246,9 @@ The component auto-detects and renders YouTube links, just pass a YouTube URL to
     <Media
       src="https://www.youtube.com/watch?v=TQT_FSdxbC8"
       aspectRatio="16/9"
+      autoplay={false}
+      controls={true}
+      sound={true}
       radius="xl"
     />
   }
@@ -253,6 +258,9 @@ The component auto-detects and renders YouTube links, just pass a YouTube URL to
 `<Media
     src="https://www.youtube.com/watch?v=TQT_FSdxbC8"
     aspectRatio="16/9"
+    autoplay={false}
+    controls={true}
+    sound={true}
     radius="xl"
 />`,
       language: "tsx",
@@ -275,6 +283,10 @@ The component auto-detects and renders YouTube links, just pass a YouTube URL to
     ["priority", "boolean"],
     ["unoptimized", "boolean"],
     ["sizes", ["string", "number"], "100vw"],
+    ["loop", "boolean", "true"],
+    ["autoplay", "boolean", "true"],
+    ["sound", "boolean", "false"],
+    ["controls", "boolean", "false"],
     ["className"],
     ["style"],
     ["...flex"]

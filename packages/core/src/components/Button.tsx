@@ -10,7 +10,7 @@ import { IconName } from "../icons";
 
 interface CommonProps {
   variant?: "primary" | "secondary" | "tertiary" | "danger";
-  size?: "s" | "m" | "l";
+  size?: "xs" | "s" | "m" | "l" | "xl";
   radius?:
     | "none"
     | "top"
@@ -66,8 +66,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps | AnchorProps>(
     },
     ref,
   ) => {
-    const iconSize = size === "l" ? "s" : size === "m" ? "s" : "xs";
-    const radiusSize = size === "s" || size === "m" ? "m" : "l";
+    const iconSize = size === "l" || size === "xl" ? "s" : size === "m" ? "s" : "xs";
+    const radiusSize = size === "xs" ? "s" : size === "s" || size === "m" ? "m" : "l";
 
     return (
       <ElementType

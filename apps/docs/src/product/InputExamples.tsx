@@ -11,7 +11,6 @@ import {
   OTPInput, 
   PasswordInput, 
   TagInput,
-  Flex,
   Text,
   Kbd,
   useToast,
@@ -185,6 +184,7 @@ export function NumberInputExample() {
     <NumberInput
       id="number-input-example"
       label="Quantity"
+      height="xl"
       value={value}
       onChange={handleChange}
       min={0}

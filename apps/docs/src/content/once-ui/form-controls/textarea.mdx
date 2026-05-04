@@ -177,9 +177,47 @@ Set the `lines` prop to "auto" to make the textarea automatically resize based o
   ]}
 />
 
-## Styling
+## Height
 
-Customize the appearance of the `Textarea` using the `radius` prop.
+Use the `height` prop to set the height of the input.
+
+<CodeBlock
+  marginTop="16"
+  marginBottom="24"
+  preview={
+    <Column fillWidth gap="4">
+      <Textarea height="xs" label="Extra small textarea" />
+      <Textarea height="s" label="Small textarea" />
+      <Textarea height="m" label="Medium textarea" />
+      <Textarea height="l" label="Large textarea" />
+      <Textarea height="xl" label="Extra large textarea" />
+    </Column>
+  }
+  codes={[
+    {
+      code:
+`const [value, setValue] = useState<string>("");
+
+const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setValue(e.target.value);
+};
+
+<Textarea
+    id="height-textarea"
+    placeholder="Height"
+    value={value}
+    onChange={handleChange}
+    height="l"
+/>`,
+      language: "tsx",
+      label: "Height"
+    }
+  ]}
+/>
+
+## Radius
+
+You can use the `radius` prop to apply custom radius to sides or corners. It works well with the `Column` component's `-1` gap to create a seamless connection between textareas.
 
 <CodeBlock
   marginTop="16"
@@ -258,6 +296,36 @@ const handleChange = (e) => {
   ]}
 />
 
+## Sizes
+
+The Textarea component supports five sizes: extra small, small, medium, large, and extra large.
+
+<CodeBlock
+  marginTop="16"
+  marginBottom="24"
+  preview={
+    <Column fillWidth gap="16">
+      <Textarea id="size-xs" placeholder="Extra Small" height="xs" />
+      <Textarea id="size-s" placeholder="Small" height="s" />
+      <Textarea id="size-m" placeholder="Medium" height="m" />
+      <Textarea id="size-l" placeholder="Large" height="l" />
+      <Textarea id="size-xl" placeholder="Extra Large" height="xl" />
+    </Column>
+  }
+  codes={[
+    {
+      code:
+`<Textarea placeholder="Extra Small" height="xs" />
+<Textarea placeholder="Small" height="s" />
+<Textarea placeholder="Medium" height="m" />
+<Textarea placeholder="Large" height="l" />
+<Textarea placeholder="Extra Large" height="xl" />`,
+      language: "tsx",
+      label: "Sizes"
+    }
+  ]}
+ />
+
 ## Validation
 
 Use the `validate` prop to add custom validation to the `Textarea`.
@@ -329,6 +397,7 @@ const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     ["id", "string"],
     ["label", "string"],
     ["placeholder", "string"],
+    ["height", ["xs", "s", "m", "l", "xl"], "m"],
     ["lines", ["number", "auto"], "3"],
     ["error", "boolean", "false"],
     ["errorMessage", "ReactNode"],
@@ -337,6 +406,7 @@ const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     ["hasPrefix", "ReactNode"],
     ["hasSuffix", "ReactNode"],
     ["characterCount", "boolean", "false"],
+    ["height", ["xs", "s", "m", "l", "xl"], "m"],
     ["resize", ["horizontal", "vertical", "both", "none"], "vertical"],
     ["validate", "(value: ReactNode) => ReactNode | null"],
     ["className"],

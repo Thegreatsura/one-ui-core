@@ -58,29 +58,33 @@ You can attach icons to the left or right using `prefixIcon` and `suffixIcon`.
 
 ## Sizes
 
-Available in small, medium, and large.
+Available in extra small, small, medium, large, and extra large.
 
 <CodeBlock
   marginTop="16"
   marginBottom="24"
   preview={
     <Row gap="12" vertical="center">
-      <ToggleButton label="Small" size="s" />
-      <ToggleButton label="Medium" size="m" />
-      <ToggleButton label="Large" size="l" />
+      <ToggleButton label="XS" size="xs" />
+      <ToggleButton label="S" size="s" />
+      <ToggleButton label="M" size="m" />
+      <ToggleButton label="L" size="l" />
+      <ToggleButton label="XL" size="xl" />
     </Row>
   }
   codes={[
     {
       code:
-`<ToggleButton label="Small" size="s" />
-<ToggleButton label="Medium" size="m" />
-<ToggleButton label="Large" size="l" />`,
+`<ToggleButton label="XS" size="xs" />
+<ToggleButton label="S" size="s" />
+<ToggleButton label="M" size="m" />
+<ToggleButton label="L" size="l" />
+<ToggleButton label="XL" size="xl" />`,
       language: "tsx",
       label: "Sizes"
     }
   ]}
-/>
+ />
 
 ## Variants
 
@@ -199,7 +203,7 @@ You can pass custom content to the toggle button.
     ["label", "ReactNode"],
     ["selected", "boolean", "false"],
     ["variant", ["ghost", "outline"], "ghost"],
-    ["size", ["s", "m", "l"], "m"],
+    ["size", ["xs", "s", "m", "l", "xl"], "m"],
     ["radius", [
       "none", "top", "right", "bottom", "left",
       "top-left", "top-right", "bottom-right", "bottom-left"
@@ -216,4 +220,4 @@ You can pass custom content to the toggle button.
     ["style"],
     ["...ButtonHTMLAttributes", "ButtonAttributes"],
   ]}
-/>
+ />

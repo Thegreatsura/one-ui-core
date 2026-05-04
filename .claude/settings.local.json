@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs grep:*)",
+      "Bash(pnpm --version)",
+      "Bash(pnpm --filter @once-ui-system/dev build)",
+      "Bash(pnpm --filter @once-ui-system/dev dev)",
+      "Bash(node -e ':*)",
+      "Bash(npx kill-port:*)",
+      "Bash(rm -rf apps/dev/.next)",
+      "Bash(node -e \"const p = require\\('./packages/core/package.json'\\); console.log\\(JSON.stringify\\(p.exports, null, 2\\)\\)\")",
+      "Bash(pnpm --filter @once-ui-system/core build)"
+    ]
+  }
+}

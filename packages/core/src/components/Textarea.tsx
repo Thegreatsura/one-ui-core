@@ -18,6 +18,7 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   placeholder?: string;
   lines?: number | "auto";
+  height?: "xs" | "s" | "m" | "l" | "xl";
   error?: boolean;
   errorMessage?: ReactNode;
   description?: ReactNode;
@@ -37,6 +38,7 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   characterCount?: boolean;
   resize?: "horizontal" | "vertical" | "both" | "none";
   validate?: (value: ReactNode) => ReactNode | null;
+  disabled?: boolean;
 }
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -46,6 +48,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       label,
       placeholder,
       lines = 3,
+      height = "m",
       error = false,
       errorMessage,
       description,
@@ -56,6 +59,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       characterCount,
       resize = "vertical",
       validate,
+      disabled = false,
       children,
       onFocus,
       onBlur,
@@ -68,14 +72,15 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const [isFocused, setIsFocused] = useState(false);
     const [isFilled, setIsFilled] = useState(!!props.value);
     const [validationError, setValidationError] = useState<ReactNode | null>(null);
-    const [height, setHeight] = useState<number | undefined>(undefined);
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
     const debouncedValue = useDebounce(props.value, 1000);
 
     const adjustHeight = () => {
       if (textareaRef.current) {
+        const scrollY = window.scrollY;
         textareaRef.current.style.height = "auto";
-        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Set to scroll height
+        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+        window.scrollTo({ top: scrollY });
       }
     };
 
@@ -120,6 +125,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     }, [debouncedValue, validateInput]);
 
     useEffect(() => {
+      setIsFilled(!!props.value);
+    }, [props.value]);
+
+    useEffect(() => {
       if (lines === "auto") {
         adjustHeight();
       }
@@ -127,12 +136,20 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 
     const displayError = validationError || errorMessage;
 
+    const fontSizeMap = {
+      xs: "font-s",
+      s: "font-s",
+      m: "font-m",
+      l: "font-l",
+      xl: "font-xl",
+    };
+
     const textareaClassNames = classNames(
       styles.input,
       styles.textarea,
       "font-body",
       "font-default",
-      "font-m",
+      fontSizeMap[height],
       {
         [styles.filled]: isFilled,
         [styles.focused]: isFocused,
@@ -161,6 +178,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           vertical="stretch"
           className={classNames(
             styles.base,
+            height && styles[height],
             lines !== "auto" && resize !== "none" && styles.textareaBase,
             radius === "none" ? "radius-none" : radius ? `radius-l-${radius}` : "radius-l",
           )}
@@ -185,6 +203,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               id={id}
               rows={typeof lines === "number" ? lines : 1}
               placeholder={placeholder}
+              disabled={disabled}
               onFocus={handleFocus}
               onBlur={handleBlur}
               className={textareaClassNames + " scrollbar-minimal"}
@@ -193,7 +212,6 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               style={{
                 ...style,
                 resize: lines === "auto" ? "none" : resize,
-                height: height ? `${height}rem` : "auto",
               }}
               onChange={handleChange}
             />
@@ -210,29 +228,30 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               </Text>
             )}
             {children}
-            {characterCount && props.maxLength && (
-            <Row fillWidth paddingLeft="16" paddingY="8" className={styles.suffix}>
-              <Text
-                variant="label-default-s"
-                onBackground={
-                  props.maxLength - String(props.value || '').length <= 5
-                    ? "danger-weak"
-                    : props.maxLength - String(props.value || '').length <= 10
-                      ? "warning-weak"
-                      : "neutral-weak"
-                }
-              >
-                {props.maxLength - String(props.value || '').length}
-              </Text>
-            </Row>
-          )}
           </Column>
-          {hasSuffix && (
-            <Row paddingRight="12" className={styles.suffix}>
-              {hasSuffix}
-            </Row>
-          )}
+          
         </Row>
+        {characterCount && props.maxLength && (
+          <Row paddingLeft="16" paddingY="8" className={styles.suffix} position="static">
+            <Text
+              variant="label-default-s"
+              onBackground={
+                props.maxLength - String(props.value || '').length <= 5
+                  ? "danger-weak"
+                  : props.maxLength - String(props.value || '').length <= 10
+                    ? "warning-weak"
+                      : "neutral-weak"
+              }
+            >
+              {props.maxLength - String(props.value || '').length}
+            </Text>
+          </Row>
+        )}
+        {hasSuffix && (
+          <Row paddingRight="12" className={styles.suffix}>
+            {hasSuffix}
+          </Row>
+        )}
         {displayError && errorMessage !== false && (
           <Row paddingX="16" id={`${id}-error`} textVariant="body-default-s" onBackground="danger-weak">
             {displayError}

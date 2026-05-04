@@ -27,37 +27,36 @@ export const ThemeInit: React.FC<ThemeInitProps> = ({ config }) => {
           (function() {
             try {
               const root = document.documentElement;
-              
-              // Set defaults from config
               const config = ${JSON.stringify(config)};
-              
-              // Apply default values
+
+              // Apply config defaults FIRST (prevents FOUC)
               Object.entries(config).forEach(([key, value]) => {
                 root.setAttribute('data-' + key, value);
               });
-              
-              // Resolve theme
+
               const resolveTheme = (themeValue) => {
                 if (!themeValue || themeValue === 'system') {
                   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
                 }
                 return themeValue;
               };
-              
-              // Apply saved theme or use config default
+
+              // Priority:
+              // 1. localStorage
+              // 2. config.theme
               const savedTheme = localStorage.getItem('data-theme');
-              // Only override with system preference if explicitly set to 'system'
-              const resolvedTheme = savedTheme ? resolveTheme(savedTheme) : config.theme === 'system' ? resolveTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : config.theme;
-              root.setAttribute('data-theme', resolvedTheme);
-              
-              // Apply any saved style overrides
-              const styleKeys = Object.keys(config);
-              styleKeys.forEach(key => {
+              const finalTheme = savedTheme ?? config.theme;
+
+              root.setAttribute('data-theme', resolveTheme(finalTheme));
+
+              // Apply overrides AFTER theme
+              Object.keys(config).forEach(key => {
                 const value = localStorage.getItem('data-' + key);
                 if (value) {
                   root.setAttribute('data-' + key, value);
                 }
               });
+
             } catch (e) {
               console.error('Failed to initialize theme:', e);
               document.documentElement.setAttribute('data-theme', 'dark');

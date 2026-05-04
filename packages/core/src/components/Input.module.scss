@@ -51,10 +51,22 @@
 }
 
 .textareaLabel {
-    top: var(--static-space-16);
+    top: var(--static-space-12);
+}
 
-    &.floating {
-        transform: scale(0.75) translateY(calc(-1 * var(--static-space-16)));
+.xs {
+    min-height: var(--static-space-40);
+
+    .label {
+        &.floating {
+            top: calc(var(--static-space-4) - var(--static-space-1));
+        }
+    }
+
+    .inputLabel {
+        &.floating {
+            transform: scale(0.6);
+        }
     }
 }
 
@@ -69,9 +81,31 @@
 }
 
 .m {
+    min-height: var(--static-space-56);
+    
     .label {
         &.floating {
             top: calc(var(--static-space-8) - var(--static-space-2));
+        }
+    }
+}
+
+.l {
+    min-height: var(--static-space-64);
+    
+    .label {
+        &.floating {
+            top: calc(var(--static-space-8) - var(--static-space-2));
+        }
+    }
+}
+
+.xl {
+    min-height: var(--static-space-72);
+    
+    .label {
+        &.floating {
+            top: calc(var(--static-space-12) - var(--static-space-2));
         }
     }
 }
@@ -84,6 +118,7 @@
     color: var(--neutral-on-background-strong);
     padding: 0 var(--static-space-16);
     outline: none;
+    border-radius: var(--radius-8);
 
     &.placeholder {
         padding-top: 0;

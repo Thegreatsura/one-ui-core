@@ -2,7 +2,7 @@
 
 import React, { forwardRef, ReactNode } from "react";
 import { ElementType } from "./ElementType";
-import { Flex, Icon, Tooltip, HoverCard } from ".";
+import { Flex, Icon, Tooltip, HoverCard, Spinner } from ".";
 import buttonStyles from "./Button.module.scss";
 import iconStyles from "./IconButton.module.scss";
 import classNames from "classnames";
@@ -11,7 +11,7 @@ import { IconName } from "../icons";
 interface CommonProps {
   icon?: IconName;
   id?: string;
-  size?: "s" | "m" | "l";
+  size?: "xs" | "s" | "m" | "l" | "xl";
   radius?:
     | "none"
     | "top"
@@ -22,9 +22,12 @@ interface CommonProps {
     | "top-right"
     | "bottom-right"
     | "bottom-left";
-  tooltip?: string;
+  rounded?: boolean;
+  tooltip?: ReactNode;
   tooltipPosition?: "top" | "bottom" | "left" | "right";
   variant?: "primary" | "secondary" | "tertiary" | "danger" | "ghost";
+  loading?: boolean;
+  disabled?: boolean;
   className?: string;
   style?: React.CSSProperties;
   href?: string;
@@ -41,9 +44,12 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps | AnchorProps>(
       size = "m",
       id,
       radius,
+      rounded = false,
       tooltip,
       tooltipPosition = "top",
       variant = "primary",
+      loading = false,
+      disabled = false,
       href,
       children,
       className,
@@ -59,6 +65,8 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps | AnchorProps>(
         id={id}
         href={href}
         ref={ref}
+        disabled={disabled}
+        data-border={rounded ? "rounded" : undefined}
         className={classNames(
           buttonStyles.button,
           buttonStyles[variant],
@@ -71,15 +79,25 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps | AnchorProps>(
               : `radius-${radiusSize}`,
           "text-decoration-none",
           "button",
-          "cursor-interactive",
+          disabled ? "cursor-not-allowed" : "cursor-interactive",
+          {
+            [buttonStyles.disabled]: disabled,
+          },
           className,
         )}
         style={style}
         aria-label={tooltip || icon}
+        aria-disabled={disabled}
         {...props}
       >
         <Flex fill center>
-          {children ? children : <Icon name={icon} size="s" />}
+          {loading ? (
+            <Spinner size={size === "l" ? "s" : "xs"} />
+          ) : children ? (
+            children
+          ) : (
+            <Icon name={icon} size="s" />
+          )}
         </Flex>
       </ElementType>
     );
