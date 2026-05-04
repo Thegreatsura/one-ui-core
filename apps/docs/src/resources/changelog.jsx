@@ -2,6 +2,38 @@ import { SmartLink, InlineCode } from "@once-ui-system/core";
 
 const changelog = [
   {
+    date: "2026-05-04",
+    title: "Once UI 1.7: Form with Intent",
+    image: "/images/changelog/once-ui-1-7.jpg",
+    sections: [
+      {
+        title: "New components",
+        bullets: [
+          <><SmartLink unstyled href="/once-ui/components/scrollContainer">ScrollContainer</SmartLink>: New media display component</>,
+          <><SmartLink unstyled href="/once-ui/components/splitView">SplitView</SmartLink>: New adjustable layout component</>,
+          <><SmartLink unstyled href="/once-ui/components/Modal">Modal</SmartLink>: New fullscreen modal component</>,
+          <><SmartLink unstyled href="/once-ui/effects/BlobFx">BlobFx</SmartLink>: New fluid blob effect</>,
+          <><SmartLink unstyled href="/once-ui/effects/FadingLettersFx">FadingLettersFx</SmartLink>: New fading letters text effect</>,
+        ],
+      },
+      {
+        title: "Component improvements",
+        bullets: [
+          <><SmartLink unstyled href="/once-ui/components/media">Media</SmartLink>: Video controls and sizes shorthand</>,
+          <><SmartLink unstyled href="/once-ui/components/timeline">Timeline</SmartLink>: Improved layout and spacing</>,
+          <>Flex & Grid: Removed unnecessary class duplication</>,
+          <>Textarea: Fixed &quot;jumping&quot; issue when using auto height</>,
+        ]
+      },
+      {
+        title: "Accessibility improvements",
+        bullets: [
+          <>Buttons: remove hover effect on touch devices</>,
+        ],
+      }
+    ]
+  },
+  {
     date: "2026-02-03",
     title: "Once UI 1.6: Presence in structure",
     image: "/images/changelog/once-ui-1-6.jpg",
@@ -10,7 +42,7 @@ const changelog = [
         title: "New components",
         bullets: [
           <>ScrollLock: New utility component</>,
-          <><SmartLink unstyled href="/once-ui/config"></SmartLink>ThemeInit: New utility component</>,
+          <><SmartLink unstyled href="/once-ui/config">ThemeInit</SmartLink>: New utility component</>,
         ],
       },
       {
@@ -220,7 +252,7 @@ const changelog = [
     date: "2025-05-29",
     title: "Once UI Data Viz Module",
     image: "/images/changelog/once-ui.jpg",
-    description: "We've released the Once UI Data Viz module, a collection of components for creating beautiful charts and graphs.",
+    description: "We&apos;ve released the Once UI Data Viz module, a collection of components for creating beautiful charts and graphs.",
     sections: [
       {
         title: "Components",

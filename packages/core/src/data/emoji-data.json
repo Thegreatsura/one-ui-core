@@ -2160,6 +2160,16 @@
   ],
   "food": [
     {
+      "char": "🍌",
+      "description": "banana",
+      "aliases": [
+        "banana"
+      ],
+      "tags": [
+        "fruit"
+      ]
+    },
+    {
       "char": "🍏",
       "description": "green apple",
       "aliases": [
