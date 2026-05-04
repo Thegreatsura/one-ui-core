@@ -50,17 +50,23 @@ Once UI requires the following dependencies to function properly:
 
 <Table
   marginBottom="24"
-  data={[
-    ["Package", "Version", "Purpose"],
-    ["next", ">=15.5", "Next.js framework"],
-    ["react", ">=18", "React library"],
-    ["react-dom", ">=18", "React DOM library"],
-    ["sass", "^1.77.6", "CSS preprocessor for styling"],
-    ["@floating-ui/react-dom", "^2.1.8", "Positioning for dropdowns"],
-    ["classnames", "^2.5.1", "Utility for conditional CSS classes"],
-    ["date-fns", "^4.1.0", "Date utility library"],
-    ["react-icons", "^5.6.0", "Icon library"],
-  ]}
+  data={{
+    headers: [
+      { content: "Package", key: "package" },
+      { content: "Version", key: "version" },
+      { content: "Purpose", key: "purpose" },
+    ],
+    rows: [
+      ["next", ">=15.5", "Next.js framework"],
+      ["react", ">=18", "React library"],
+      ["react-dom", ">=18", "React DOM library"],
+      ["sass", "^1.77.6", "CSS preprocessor for styling"],
+      ["@floating-ui/react-dom", "^2.1.8", "Positioning for dropdowns"],
+      ["classnames", "^2.5.1", "Utility for conditional CSS classes"],
+      ["date-fns", "^4.1.0", "Date utility library"],
+      ["react-icons", "^5.6.0", "Icon library"],
+    ]
+  }}
 />
 
 ### Optional dependencies
@@ -69,11 +75,17 @@ These dependencies are only needed if you use specific features:
 
 <Table
   marginBottom="24"
-  data={[
-    ["Package", "Version", "Used for"],
-    ["recharts", ">=3.0.0", "Data visualization components"],
-    ["prismjs", ">=1.27.0", "Code syntax highlighting in CodeBlock"],
-    ["compressorjs", ">=1.2.0", "Image compression in MediaUpload"],
-    ["sharp", "^0.33.4", "Image optimization in Next.js"],
-  ]}
+  data={{
+    headers: [
+      { content: "Package", key: "package" },
+      { content: "Version", key: "version" },
+      { content: "Used for", key: "usedFor" },
+    ],
+    rows: [
+      ["recharts", ">=3.0.0", "Data visualization components"],
+      ["prismjs", ">=1.27.0", "Code syntax highlighting in CodeBlock"],
+      ["compressorjs", ">=1.2.0", "Image compression in MediaUpload"],
+      ["sharp", "^0.33.4", "Image optimization in Next.js"],
+    ]
+  }}
 />
