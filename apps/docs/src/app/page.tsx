@@ -120,7 +120,8 @@ export default function Home() {
                     gap="8"
                     vertical="center"
                   >
-                    <Text weight="strong" onBackground="brand-strong">Once UI 1.5</Text> Curiosity in code
+                    <Text weight="strong" onBackground="brand-strong">Once UI 1.7</Text> Form with intent
+
                     <Tag variant="brand" data-border="rounded"><ShineFx speed={2} baseOpacity={0.8}>New</ShineFx></Tag>
                   </Row>
                 </Row>
