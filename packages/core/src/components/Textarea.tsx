@@ -179,8 +179,9 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           className={classNames(
             styles.base,
             height && styles[height],
-            lines !== "auto" && resize !== "none" && styles.textareaBase,
+            lines !== "auto" && resize !== "none" && styles.resizeHandle,
             radius === "none" ? "radius-none" : radius ? `radius-l-${radius}` : "radius-l",
+            lines !== "auto" && resize !== "none" && "radius-s-bottom-right",
           )}
         >
           {hasPrefix && (
@@ -188,7 +189,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               {hasPrefix}
             </Row>
           )}
-          <Column fillWidth>
+          <Column fillWidth padding="4">
             <textarea
               {...props}
               ref={(node) => {
@@ -228,30 +229,29 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               </Text>
             )}
             {children}
+            {characterCount && props.maxLength && (
+              <Row fillWidth paddingLeft="12" paddingY="4" className={styles.suffix}>
+                <Text
+                  variant="label-default-s"
+                  onBackground={
+                    props.maxLength - String(props.value || '').length <= 5
+                      ? "danger-weak"
+                      : props.maxLength - String(props.value || '').length <= 10
+                        ? "warning-weak"
+                          : "neutral-weak"
+                  }
+                >
+                  {props.maxLength - String(props.value || '').length}
+                </Text>
+              </Row>
+            )}
           </Column>
-          
+          {hasSuffix && (
+            <Row paddingRight="12" className={styles.suffix}>
+              {hasSuffix}
+            </Row>
+          )}
         </Row>
-        {characterCount && props.maxLength && (
-          <Row paddingLeft="16" paddingY="8" className={styles.suffix} position="static">
-            <Text
-              variant="label-default-s"
-              onBackground={
-                props.maxLength - String(props.value || '').length <= 5
-                  ? "danger-weak"
-                  : props.maxLength - String(props.value || '').length <= 10
-                    ? "warning-weak"
-                      : "neutral-weak"
-              }
-            >
-              {props.maxLength - String(props.value || '').length}
-            </Text>
-          </Row>
-        )}
-        {hasSuffix && (
-          <Row paddingRight="12" className={styles.suffix}>
-            {hasSuffix}
-          </Row>
-        )}
         {displayError && errorMessage !== false && (
           <Row paddingX="16" id={`${id}-error`} textVariant="body-default-s" onBackground="danger-weak">
             {displayError}

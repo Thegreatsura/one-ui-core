@@ -183,7 +183,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               {hasPrefix}
             </Row>
           )}
-          <Column fillWidth>
+          <Column fillWidth padding="4">
             <input
               {...props}
               ref={ref}
