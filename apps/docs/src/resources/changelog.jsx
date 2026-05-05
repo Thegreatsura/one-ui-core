@@ -7,6 +7,12 @@ const changelog = [
     image: "/images/changelog/once-ui-1-7.jpg",
     sections: [
       {
+        title: "Dependencies",
+        bullets: [
+          <>Recharts, PrismJS, CompressorJS and Sharp are now optional dependencies. Please install them according to your needs when migrating to the 1.7 version.</>,
+        ],
+      },
+      {
         title: "New components",
         bullets: [
           <><SmartLink unstyled href="/once-ui/components/scrollContainer">ScrollContainer</SmartLink>: New media display component</>,
@@ -21,6 +27,9 @@ const changelog = [
         bullets: [
           <><SmartLink unstyled href="/once-ui/components/media">Media</SmartLink>: Video controls and sizes shorthand</>,
           <><SmartLink unstyled href="/once-ui/components/timeline">Timeline</SmartLink>: Improved layout and spacing</>,
+          <>Button & ToggleButton: New XS and XL sizes</>,
+          <>Input & Textarea: New XS, L, and XL sizes</>,
+          <>Input & Textarea: New Ghost variant</>,
           <>Flex & Grid: Removed unnecessary class duplication</>,
           <>Textarea: Fixed &quot;jumping&quot; issue when using auto height</>,
         ]

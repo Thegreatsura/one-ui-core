@@ -251,7 +251,7 @@ export function TagInputExample() {
       value={tags}
       onChange={handleChange}
       placeholder="Add interest"
-      hasSuffix={<Kbd position="absolute" top="12" right="12">Enter</Kbd>}
+      hasSuffix={<Kbd position="absolute" top="16" right="12">Enter</Kbd>}
     />
   );
 }
