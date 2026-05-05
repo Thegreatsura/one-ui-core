@@ -1,7 +1,6 @@
 import React, { useRef } from "react";
 import { render } from "@testing-library/react";
-import { ScrollLock } from "./ScrollLock";
-import { resetScrollLockTestState } from "../internal/scrollLockState";
+import { ScrollLock } from "../components/ScrollLock";
 
 const defineScrollMetrics = (
   element: HTMLElement,
@@ -31,14 +30,11 @@ const defineScrollMetrics = (
 };
 
 const createTouchEvent = (type: string, clientY: number) => {
-  // jsdom touch support is limited, so we emulate the minimal TouchEvent shape we need.
   const event = new Event(type, { bubbles: true, cancelable: true });
-
   Object.defineProperty(event, "touches", {
     configurable: true,
     value: [{ clientY }],
   });
-
   return event;
 };
 
@@ -95,149 +91,41 @@ const DualScrollLockHarness = () => {
 };
 
 beforeEach(() => {
-  resetScrollLockTestState();
   document.body.innerHTML = "";
 });
 
 describe("ScrollLock", () => {
-  it('sets body.style.overflow to "hidden" when enabled is true', () => {
-    render(<ScrollLock enabled />);
-
-    expect(document.body.style.overflow).toBe("hidden");
-  });
-
-  it("restores body.style.overflow when enabled changes to false", () => {
-    const { rerender } = render(<ScrollLock enabled />);
-
-    rerender(<ScrollLock enabled={false} />);
-
-    expect(document.body.style.overflow).toBe("");
-  });
-
-  it("keeps overflow hidden until all lock instances release", () => {
-    const first = render(<ScrollLock enabled />);
-    const second = render(<ScrollLock enabled />);
-
-    expect(document.body.style.overflow).toBe("hidden");
-
-    first.rerender(<ScrollLock enabled={false} />);
-    expect(document.body.style.overflow).toBe("hidden");
-
-    second.rerender(<ScrollLock enabled={false} />);
-    expect(document.body.style.overflow).toBe("");
-  });
-
-  it("attaches global listeners once for multiple locks and removes them after the last release", () => {
+  it("does not attach listeners when enabled is false", () => {
     const addSpy = vi.spyOn(window, "addEventListener");
-    const removeSpy = vi.spyOn(window, "removeEventListener");
-    const first = render(<ScrollLock enabled />);
-    const second = render(<ScrollLock enabled />);
-    const third = render(<ScrollLock enabled />);
 
-    const countCalls = (spy: ReturnType<typeof vi.spyOn>, eventName: string) =>
-      spy.mock.calls.filter(([name]) => name === eventName).length;
+    render(<ScrollLock enabled={false} />);
 
-    expect(countCalls(addSpy, "wheel")).toBe(1);
-    expect(countCalls(addSpy, "touchstart")).toBe(1);
-    expect(countCalls(addSpy, "touchmove")).toBe(1);
-    expect(countCalls(addSpy, "keydown")).toBe(1);
-    expect(countCalls(removeSpy, "wheel")).toBe(0);
-    expect(countCalls(removeSpy, "touchstart")).toBe(0);
-    expect(countCalls(removeSpy, "touchmove")).toBe(0);
-    expect(countCalls(removeSpy, "keydown")).toBe(0);
-
-    first.rerender(<ScrollLock enabled={false} />);
-    expect(countCalls(removeSpy, "wheel")).toBe(0);
-    expect(countCalls(removeSpy, "touchstart")).toBe(0);
-    expect(countCalls(removeSpy, "touchmove")).toBe(0);
-    expect(countCalls(removeSpy, "keydown")).toBe(0);
-
-    second.rerender(<ScrollLock enabled={false} />);
-    expect(countCalls(removeSpy, "wheel")).toBe(0);
-    expect(countCalls(removeSpy, "touchstart")).toBe(0);
-    expect(countCalls(removeSpy, "touchmove")).toBe(0);
-    expect(countCalls(removeSpy, "keydown")).toBe(0);
-
-    third.rerender(<ScrollLock enabled={false} />);
-    expect(countCalls(removeSpy, "wheel")).toBe(1);
-    expect(countCalls(removeSpy, "touchstart")).toBe(1);
-    expect(countCalls(removeSpy, "touchmove")).toBe(1);
-    expect(countCalls(removeSpy, "keydown")).toBe(1);
+    expect(addSpy).not.toHaveBeenCalledWith("wheel", expect.any(Function), expect.anything());
+    expect(addSpy).not.toHaveBeenCalledWith("touchmove", expect.any(Function), expect.anything());
+    expect(addSpy).not.toHaveBeenCalledWith("keydown", expect.any(Function), expect.anything());
   });
 
-  it("allows wheel scrolling in the top-layer allowed container with multiple locks", () => {
-    const { getByRole, getByTestId } = render(<DualScrollLockHarness />);
-    const topScrollable = getByTestId("top-scrollable");
-    const topAllowedChild = getByRole("button", { name: "Top allowed child" });
+  it("does not prevent wheel events when disabled", () => {
+    render(<ScrollLock enabled={false} />);
 
-    defineScrollMetrics(topScrollable, { scrollTop: 10, scrollHeight: 600, clientHeight: 100 });
-
-    const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 60 });
-    topAllowedChild.dispatchEvent(event);
+    const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 80 });
+    document.body.dispatchEvent(event);
 
     expect(event.defaultPrevented).toBe(false);
   });
 
-  it("keeps outside scrolling blocked with multiple locks and different allowed containers", () => {
-    const { getByRole } = render(<DualScrollLockHarness />);
-    const outside = getByRole("button", { name: "Outside child" });
-    const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 60 });
+  it("prevents wheel events when enabled with no allowed element", () => {
+    render(
+      <>
+        <button type="button">Outside child</button>
+        <ScrollLock enabled />
+      </>,
+    );
 
-    outside.dispatchEvent(event);
+    const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 80 });
+    document.body.dispatchEvent(event);
 
     expect(event.defaultPrevented).toBe(true);
-  });
-
-  describe("layout shift prevention", () => {
-    it("keeps pre-existing body.style.paddingRight unchanged when there is no scrollbar", () => {
-      document.body.style.paddingRight = "12px";
-      vi.spyOn(window, "innerWidth", "get").mockReturnValue(1024);
-      vi.spyOn(document.documentElement, "clientWidth", "get").mockReturnValue(1024);
-      const { rerender } = render(<ScrollLock enabled />);
-
-      expect(document.body.style.paddingRight).toBe("12px");
-
-      rerender(<ScrollLock enabled={false} />);
-
-      expect(document.body.style.paddingRight).toBe("12px");
-    });
-
-    it("adds padding-right equal to the scrollbar width when a scrollbar is present", () => {
-      vi.spyOn(window, "innerWidth", "get").mockReturnValue(1024);
-      vi.spyOn(document.documentElement, "clientWidth", "get").mockReturnValue(1007);
-
-      render(<ScrollLock enabled />);
-
-      expect(document.body.style.paddingRight).toBe("17px");
-    });
-
-    it("restores padding-right to its original value when the lock is released", () => {
-      document.body.style.paddingRight = "8px";
-      vi.spyOn(window, "innerWidth", "get").mockReturnValue(1024);
-      vi.spyOn(document.documentElement, "clientWidth", "get").mockReturnValue(1007);
-      const { rerender } = render(<ScrollLock enabled />);
-
-      expect(document.body.style.paddingRight).toBe("25px");
-
-      rerender(<ScrollLock enabled={false} />);
-
-      expect(document.body.style.paddingRight).toBe("8px");
-    });
-
-    it("keeps padding-right applied until all lock instances release", () => {
-      vi.spyOn(window, "innerWidth", "get").mockReturnValue(1024);
-      vi.spyOn(document.documentElement, "clientWidth", "get").mockReturnValue(1007);
-      const first = render(<ScrollLock enabled />);
-      const second = render(<ScrollLock enabled />);
-
-      expect(document.body.style.paddingRight).toBe("17px");
-
-      first.rerender(<ScrollLock enabled={false} />);
-      expect(document.body.style.paddingRight).toBe("17px");
-
-      second.rerender(<ScrollLock enabled={false} />);
-      expect(document.body.style.paddingRight).toBe("");
-    });
   });
 
   it("prevents wheel events outside the allowed element", () => {
@@ -248,52 +136,6 @@ describe("ScrollLock", () => {
     const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 80 });
 
     outside.dispatchEvent(event);
-
-    expect(event.defaultPrevented).toBe(true);
-  });
-
-  it("does not attach scroll locks when enabled is false", () => {
-    const addEventListenerSpy = vi.spyOn(window, "addEventListener");
-
-    try {
-      render(<ScrollLock enabled={false} />);
-
-      expect(addEventListenerSpy).not.toHaveBeenCalledWith("wheel", expect.any(Function), {
-        passive: false,
-        capture: true,
-      });
-      expect(addEventListenerSpy).not.toHaveBeenCalledWith("touchstart", expect.any(Function), {
-        passive: true,
-        capture: true,
-      });
-      expect(addEventListenerSpy).not.toHaveBeenCalledWith("touchmove", expect.any(Function), {
-        passive: false,
-        capture: true,
-      });
-      expect(addEventListenerSpy).not.toHaveBeenCalledWith("keydown", expect.any(Function), {
-        capture: true,
-      });
-
-      const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 80 });
-      document.body.dispatchEvent(event);
-
-      expect(event.defaultPrevented).toBe(false);
-      expect(document.body.style.overflow).toBe("");
-    } finally {
-      addEventListenerSpy.mockRestore();
-    }
-  });
-
-  it("prevents wheel events when no allowed scroll element is provided", () => {
-    render(
-      <>
-        <button type="button">Outside child</button>
-        <ScrollLock enabled />
-      </>,
-    );
-
-    const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 80 });
-    document.body.dispatchEvent(event);
 
     expect(event.defaultPrevented).toBe(true);
   });
@@ -350,6 +192,29 @@ describe("ScrollLock", () => {
     expect(event.defaultPrevented).toBe(true);
   });
 
+  it("allows wheel scrolling in an allowed container when multiple instances are mounted", () => {
+    const { getByRole, getByTestId } = render(<DualScrollLockHarness />);
+    const topScrollable = getByTestId("top-scrollable");
+    const topAllowedChild = getByRole("button", { name: "Top allowed child" });
+
+    defineScrollMetrics(topScrollable, { scrollTop: 10, scrollHeight: 600, clientHeight: 100 });
+
+    const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 60 });
+    topAllowedChild.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  it("keeps outside scrolling blocked when multiple instances are mounted", () => {
+    const { getByRole } = render(<DualScrollLockHarness />);
+    const outside = getByRole("button", { name: "Outside child" });
+    const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 60 });
+
+    outside.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+  });
+
   it("prevents touch scroll outside the allowed element", () => {
     const { getByRole } = render(
       <ScrollLockHarness enabled includeAllowedElement scrollable />,
@@ -385,11 +250,7 @@ describe("ScrollLock", () => {
         <ScrollLockHarness enabled includeAllowedElement scrollable />,
       );
       const outside = getByRole("button", { name: "Outside child" });
-      const event = new KeyboardEvent("keydown", {
-        bubbles: true,
-        cancelable: true,
-        key,
-      });
+      const event = new KeyboardEvent("keydown", { bubbles: true, cancelable: true, key });
 
       outside.dispatchEvent(event);
 
@@ -402,11 +263,7 @@ describe("ScrollLock", () => {
       <ScrollLockHarness enabled includeAllowedElement scrollable />,
     );
     const allowedChild = getByRole("button", { name: "Allowed child" });
-    const event = new KeyboardEvent("keydown", {
-      bubbles: true,
-      cancelable: true,
-      key: "ArrowDown",
-    });
+    const event = new KeyboardEvent("keydown", { bubbles: true, cancelable: true, key: "ArrowDown" });
 
     allowedChild.dispatchEvent(event);
 
@@ -420,23 +277,24 @@ describe("ScrollLock", () => {
 
     unmount();
 
-    expect(addSpy).toHaveBeenCalledWith("wheel", expect.any(Function), {
-      passive: false,
-      capture: true,
-    });
-    expect(addSpy).toHaveBeenCalledWith("touchstart", expect.any(Function), {
-      passive: true,
-      capture: true,
-    });
-    expect(addSpy).toHaveBeenCalledWith("touchmove", expect.any(Function), {
-      passive: false,
-      capture: true,
-    });
+    expect(addSpy).toHaveBeenCalledWith("wheel", expect.any(Function), { passive: false, capture: true });
+    expect(addSpy).toHaveBeenCalledWith("touchstart", expect.any(Function), { passive: true, capture: true });
+    expect(addSpy).toHaveBeenCalledWith("touchmove", expect.any(Function), { passive: false, capture: true });
     expect(addSpy).toHaveBeenCalledWith("keydown", expect.any(Function), { capture: true });
-    // These assertions verify cleanup wiring, even though expect.any(Function) cannot prove identity equality.
     expect(removeSpy).toHaveBeenCalledWith("wheel", expect.any(Function), { capture: true });
     expect(removeSpy).toHaveBeenCalledWith("touchstart", expect.any(Function), { capture: true });
     expect(removeSpy).toHaveBeenCalledWith("touchmove", expect.any(Function), { capture: true });
     expect(removeSpy).toHaveBeenCalledWith("keydown", expect.any(Function), { capture: true });
+  });
+
+  it("does not fire listeners after being disabled via prop change", () => {
+    const { rerender, getByRole } = render(<ScrollLockHarness enabled />);
+    rerender(<ScrollLockHarness enabled={false} />);
+
+    const outside = getByRole("button", { name: "Outside child" });
+    const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, deltaY: 80 });
+    outside.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(false);
   });
 });

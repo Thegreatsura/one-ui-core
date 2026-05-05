@@ -1,9 +1,12 @@
-import { managedInertElements, visibleDialogLayers } from "../internal/dialogState";
-import { resetScrollLockTestState } from "../internal/scrollLockState";
-
 export const resetDialogState = () => {
-  visibleDialogLayers.splice(0, visibleDialogLayers.length);
-  managedInertElements.clear();
-  resetScrollLockTestState();
   document.body.innerHTML = "";
+  document.body.style.overflow = "";
+  document.body.style.paddingRight = "";
+  document.documentElement.style.overflow = "";
+
+  document.body.childNodes.forEach((node) => {
+    if (node instanceof HTMLElement) {
+      node.inert = false;
+    }
+  });
 };
