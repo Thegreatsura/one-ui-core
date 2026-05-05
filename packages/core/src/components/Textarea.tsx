@@ -35,6 +35,7 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   className?: string;
   hasPrefix?: ReactNode;
   hasSuffix?: ReactNode;
+  variant?: "default" | "ghost";
   characterCount?: boolean;
   resize?: "horizontal" | "vertical" | "both" | "none";
   validate?: (value: ReactNode) => ReactNode | null;
@@ -56,6 +57,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       className,
       hasPrefix,
       hasSuffix,
+      variant = "default",
       characterCount,
       resize = "vertical",
       validate,
@@ -172,8 +174,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         <Row
           minHeight={placeholder ? "48" : "56"}
           transition="micro-medium"
-          border="neutral-medium"
-          background="neutral-alpha-weak"
+          border={variant === "ghost" ? "transparent" : "neutral-medium"}
+          background={variant === "ghost" ? "transparent" : "neutral-alpha-weak"}
           overflow="hidden"
           vertical="stretch"
           className={classNames(
